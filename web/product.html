@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Щелочные батарейки AA (4 шт.) — BarGo</title>
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="bootstrap-5.3.8-dist/css/bootstrap.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Your theme -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="index.html">
+      <i class="bi bi-geo-alt brand-geo" aria-hidden="true"></i>
+      <span>BarGo</span>
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#topbar" aria-controls="topbar" aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="topbar">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="index.html">Поиск</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">О нас</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Контакты</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Шапка товара -->
+<section class="py-4 section-soft border-bottom">
+  <div class="container">
+    <nav class="small mb-2" aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="index.html">Главная</a></li>
+        <li class="breadcrumb-item active">Щелочные батарейки AA (4 шт.)</li>
+      </ol>
+    </nav>
+
+    <div class="row g-4 align-items-start">
+      <div class="col-12 col-lg-5">
+        <div class="ratio ratio-16x9 rounded-3 overflow-hidden shadow-sm bg-white">
+          <img src="https://via.placeholder.com/960x540"
+               class="img-cover" alt="Щелочные батарейки AA (4 шт.)">
+        </div>
+      </div>
+      <div class="col-12 col-lg-7">
+        <h1 class="h4 mb-2">Щелочные батарейки AA (4 шт.)</h1>
+        <div class="text-muted mb-3">Артикул: DEMO-001 • Категория: Электроника</div>
+        <p class="mb-3">
+          Надёжные алкалиновые батарейки формата AA для бытовых устройств: мыши, пульты, фонарики.
+          Длительный срок службы и стабильное напряжение.
+        </p>
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+          <span class="fs-5 fw-semibold text-primary-emphasis">от 1 290 ₸</span>
+          <span class="badge bg-chip">В наличии в <span id="storesCountTop">—</span> магазинах</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Панель управления списком магазинов -->
+<section class="py-3 controls-sticky bg-white border-bottom">
+  <div class="container d-flex flex-wrap align-items-center gap-3">
+    <div class="text-muted small">Найдено магазинов: <strong id="storesFound">—</strong></div>
+
+    <div class="input-group input-group-sm" style="max-width:360px">
+      <span class="input-group-text"><i class="bi bi-shop"></i></span>
+      <input id="shopQuery" type="text" class="form-control" placeholder="Найти магазин по названию">
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <label class="small text-muted mb-0">Цена:</label>
+      <input type="number" id="minPrice" class="form-control form-control-sm" style="width:110px" placeholder="Мин" value="1000">
+      <input type="number" id="maxPrice" class="form-control form-control-sm" style="width:110px" placeholder="Макс" value="5000">
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <label class="small text-muted mb-0">Дистанция:</label>
+      <input type="number" id="maxDist" class="form-control form-control-sm" style="width:100px" value="5">
+      <span class="small text-muted">км</span>
+    </div>
+
+    <select id="sortShops" class="form-select form-select-sm ms-auto" style="max-width:240px">
+      <option value="price_asc">Цена: сначала дешевле</option>
+      <option value="price_desc">Цена: сначала дороже</option>
+      <option value="distance_asc" selected>Расстояние: ближайшие</option>
+      <option value="distance_desc">Расстояние: дальние</option>
+    </select>
+
+    <!-- Табы -->
+    <ul class="nav nav-pills ms-2" id="viewTabs" role="tablist">
+      <li class="nav-item">
+        <button class="nav-link active" id="list-tab" data-bs-toggle="tab" data-bs-target="#listPane" type="button">
+          <i class="bi bi-list"></i> Список
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" id="map-tab" data-bs-toggle="tab" data-bs-target="#mapPane" type="button">
+          <i class="bi bi-map"></i> Карта
+        </button>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- Контент: магазины -->
+<section class="py-4">
+  <div class="container">
+    <div class="tab-content">
+      <!-- Список -->
+      <div class="tab-pane fade show active" id="listPane">
+        <div id="shopsList" class="row row-cols-1 row-cols-md-2 g-3">
+
+          <!-- Магазин 1 -->
+          <div class="col shop-item"
+               data-name="Маркет 24" data-price="1290" data-distance="0.7">
+            <div class="card h-100 product-card">
+              <div class="card-body d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <h6 class="mb-1 js-name">Маркет 24</h6>
+                    <div class="text-muted small"><i class="bi bi-geo-alt"></i> 0.7 км • ул. Сарыарка, 10</div>
+                  </div>
+                  <a href="store.html" class="btn btn-outline-primary btn-sm">В магазин</a>
+                </div>
+                <div class="mt-3 d-flex gap-4">
+                  <div><span class="fw-semibold">1 290 ₸</span><span class="small text-muted d-block">цена</span></div>
+                  <div><span class="fw-semibold">В наличии</span><span class="small text-muted d-block">обновлено сегодня</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Магазин 2 -->
+          <div class="col shop-item"
+               data-name="Булат mini" data-price="1350" data-distance="1.1">
+            <div class="card h-100 product-card">
+              <div class="card-body d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <h6 class="mb-1 js-name">Булат mini</h6>
+                    <div class="text-muted small"><i class="bi bi-geo-alt"></i> 1.1 км • пр. Абая, 3</div>
+                  </div>
+                  <a href="store.html" class="btn btn-outline-primary btn-sm">В магазин</a>
+                </div>
+                <div class="mt-3 d-flex gap-4">
+                  <div><span class="fw-semibold">1 350 ₸</span><span class="small text-muted d-block">цена</span></div>
+                  <div><span class="fw-semibold">В наличии</span><span class="small text-muted d-block">обновлено сегодня</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Магазин 3 -->
+          <div class="col shop-item"
+               data-name="Дворик маркет" data-price="1390" data-distance="2.4">
+            <div class="card h-100 product-card">
+              <div class="card-body d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <h6 class="mb-1 js-name">Дворик маркет</h6>
+                    <div class="text-muted small"><i class="bi bi-geo-alt"></i> 2.4 км • ул. Жангельдина, 12</div>
+                  </div>
+                  <a href="store.html" class="btn btn-outline-primary btn-sm">В магазин</a>
+                </div>
+                <div class="mt-3 d-flex gap-4">
+                  <div><span class="fw-semibold">1 390 ₸</span><span class="small text-muted d-block">цена</span></div>
+                  <div><span class="fw-semibold">В наличии</span><span class="small text-muted d-block">обновлено сегодня</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Ничего не найдено -->
+        <div id="shopsEmpty" class="text-center text-muted py-5 d-none">
+          <i class="bi bi-search fs-1 d-block mb-2"></i>
+          Под условия не подходит ни один магазин.
+        </div>
+      </div>
+
+      <!-- Карта (пока плейсхолдер) -->
+      <div class="tab-pane fade" id="mapPane">
+        <div class="map-wrapper rounded-3 border shadow-sm">
+          <div class="map-placeholder d-flex align-items-center justify-content-center h-100">
+            <div class="text-center text-muted">
+              <i class="bi bi-map fs-1 d-block mb-2"></i>
+              Здесь будет карта с пинами магазинов и ценами
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /tab-content -->
+  </div>
+</section>
+
+<footer class="border-top py-4 bg-white">
+  <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <span class="text-muted small">© 2025 BarGo</span>
+    <ul class="nav small">
+      <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">Политика конфиденциальности</a></li>
+      <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">Условия</a></li>
+    </ul>
+  </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="bootstrap-5.3.8-dist/js/bootstrap.bundle.js"></script>
+
+<!-- Фильтр/поиск/сортировка магазинов -->
+<script>
+  const $q = document.getElementById('shopQuery');
+  const $min = document.getElementById('minPrice');
+  const $max = document.getElementById('maxPrice');
+  const $dist = document.getElementById('maxDist');
+  const $sort = document.getElementById('sortShops');
+  const $found = document.getElementById('storesFound');
+  const $foundTop = document.getElementById('storesCountTop');
+  const items = Array.from(document.querySelectorAll('.shop-item'));
+  const $list = document.getElementById('shopsList');
+  const $empty = document.getElementById('shopsEmpty');
+
+  const norm = s => (s||'').toString().trim().toLowerCase();
+
+  function apply(){
+    const q = norm($q.value);
+    const min = Number($min.value||0);
+    const max = Number($max.value||1e9);
+    const md  = Number($dist.value||1e9);
+
+    let visible = [];
+    items.forEach(el=>{
+      const name = norm(el.dataset.name);
+      const price= Number(el.dataset.price);
+      const dist = Number(el.dataset.distance);
+      const match = (!q || name.includes(q)) && price>=min && price<=max && dist<=md;
+
+      el.classList.toggle('d-none', !match);
+      if(match) visible.push(el);
+
+      // подсветка совпадения
+      const nameNode = el.querySelector('.js-name');
+      if(q){
+        const safe = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+        nameNode.innerHTML = el.dataset.name.replace(new RegExp('('+safe+')','ig'), '<mark class="search-highlight">$1</mark>');
+      } else {
+        nameNode.textContent = el.dataset.name;
+      }
+    });
+
+    // сортировка
+    const cmp = {
+      price_asc: (a,b)=>Number(a.dataset.price) - Number(b.dataset.price),
+      price_desc:(a,b)=>Number(b.dataset.price) - Number(a.dataset.price),
+      distance_asc:(a,b)=>Number(a.dataset.distance) - Number(b.dataset.distance),
+      distance_desc:(a,b)=>Number(b.dataset.distance) - Number(a.dataset.distance),
+    }[$sort.value];
+
+    visible.sort(cmp);
+
+    // перерисовка
+    const frag = document.createDocumentFragment();
+    visible.forEach(el=>frag.appendChild(el));
+    items.filter(el=>el.classList.contains('d-none')).forEach(el=>frag.appendChild(el));
+    $list.appendChild(frag);
+
+    // счётчики и "пусто"
+    $found.textContent = visible.length;
+    $foundTop.textContent = visible.length;
+    $empty.classList.toggle('d-none', visible.length>0);
+  }
+
+  [$q,$min,$max,$dist,$sort].forEach(el=>el.addEventListener('input', apply));
+  apply();
+</script>
+</body>
+</html>

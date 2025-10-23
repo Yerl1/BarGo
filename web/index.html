@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Поиск товаров — BarGo</title>
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="bootstrap-5.3.8-dist/css/bootstrap.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="#">
+        <i class="bi bi-geo-alt brand-geo" aria-hidden="true"></i>
+        <span>BarGo</span>
+      </a>
+
+      <button class="btn btn-outline-secondary d-lg-none ms-auto me-2"
+              data-bs-toggle="offcanvas" data-bs-target="#filtersOffcanvas">
+        <i class="bi bi-sliders"></i> Фильтры
+      </button>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#topbar" aria-controls="topbar" aria-expanded="false"
+              aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="topbar">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="#">Поиск</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">О нас</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Контакты</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+
+  <!-- Search row -->
+  <section class="py-4 section-soft">
+    <div class="container">
+      <form id="searchForm" class="row g-2 align-items-center" autocomplete="off">
+        <div class="col-12 col-lg-7">
+          <label for="q" class="form-label visually-hidden">Что ищем?</label>
+          <div class="input-group input-group-lg shadow-sm rounded-3 overflow-hidden">
+            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+            <input id="q" type="text" class="form-control" placeholder="Введите название товара (например, «AA батарейки»)" />
+          </div>
+        </div>
+        <div class="col-12 col-lg-auto">
+          <button class="btn btn-lg btn-primary w-100" type="submit">Найти</button>
+        </div>
+        <div class="col-12 col-lg-auto">
+          <button id="clearBtn" class="btn btn-lg btn-outline-primary w-100" type="button">Сбросить</button>
+        </div>
+      </form>
+
+      <!-- Чипы активных параметров -->
+      <div class="mt-3 d-flex flex-wrap align-items-center gap-2 small">
+        <span id="activeQueryChip" class="badge rounded-pill bg-chip d-none">Запрос: «...»</span>
+        <span id="activeSortChip" class="badge rounded-pill bg-chip d-none">Сортировка: ...</span>
+        <span id="clearAll" class="link-primary text-decoration-none d-none" role="button">Сбросить всё</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Controls: найдено + табы + сортировка -->
+  <section class="py-3 controls-sticky bg-white border-bottom">
+    <div class="container d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <div class="text-muted small">
+        Найдено: <strong id="foundCount">—</strong>
+      </div>
+
+      <!-- Табы -->
+      <ul class="nav nav-pills ms-auto me-auto" id="viewTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="list-tab"
+                  data-bs-toggle="tab" data-bs-target="#listPane"
+                  type="button" role="tab" aria-controls="listPane" aria-selected="true">
+            <i class="bi bi-grid"></i> Карточки
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="map-tab"
+                  data-bs-toggle="tab" data-bs-target="#mapPane"
+                  type="button" role="tab" aria-controls="mapPane" aria-selected="false">
+            <i class="bi bi-map"></i> Карта
+          </button>
+        </li>
+      </ul>
+
+      <!-- Сортировка -->
+      <div class="d-flex align-items-center gap-2">
+        <label for="sortSelect" class="small text-muted mb-0">Сортировка:</label>
+        <select id="sortSelect" class="form-select form-select-sm sort-select">
+          <option value="relevance" selected>По релевантности</option>
+          <option value="price_asc">Цена: сначала дешевле</option>
+          <option value="price_desc">Цена: сначала дороже</option>
+          <option value="distance_asc">Расстояние: ближайшие</option>
+          <option value="distance_desc">Расстояние: дальние</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- Content -->
+  <section class="py-4">
+    <div class="container">
+      <div class="tab-content">
+
+        <!-- LIST VIEW -->
+        <div class="tab-pane fade show active" id="listPane" role="tabpanel" aria-labelledby="list-tab">
+          <div id="cardsGrid" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+
+            <!-- Карточки. Важно: data-price и data-distance нужны для сортировки -->
+            <div class="col prod-card"
+                 data-title="Щелочные батарейки AA (4 шт.)"
+                 data-keywords="батарейка aa батарейки алкалиновые duracell energizer power"
+                 data-price="1290" data-distance="0.7">
+              <div class="card h-100 product-card">
+                <div class="ratio ratio-16x9">
+                  <img src="https://via.placeholder.com/640x360" class="card-img-top img-cover" alt="Батарейки AA">
+                </div>
+                <div class="card-body d-flex flex-column">
+                  <h6 class="card-title js-title mb-1">Щелочные батарейки AA (4 шт.)</h6>
+                  <div class="text-muted small mb-2">В наличии в 12 магазинах</div>
+                  <div class="mt-auto d-flex align-items-center justify-content-between">
+                    <div>
+                      <div class="fw-semibold text-primary-emphasis">от 1 290 ₸</div>
+                      <div class="small text-muted"><i class="bi bi-geo-alt"></i> 0.7 км</div>
+                    </div>
+                    <a href="product.html" class="btn btn-outline-primary btn-sm">Смотреть</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col prod-card"
+                 data-title="Кофе молотый 250 г"
+                 data-keywords="кофе молотый арабика robusta ground coffee 250г"
+                 data-price="2490" data-distance="1.1">
+              <div class="card h-100 product-card">
+                <div class="ratio ratio-16x9">
+                  <img src="https://via.placeholder.com/640x360" class="card-img-top img-cover" alt="Кофе молотый 250 г">
+                </div>
+                <div class="card-body d-flex flex-column">
+                  <h6 class="card-title js-title mb-1">Кофе молотый 250 г</h6>
+                  <div class="text-muted small mb-2">В наличии в 8 магазинах</div>
+                  <div class="mt-auto d-flex align-items-center justify-content-between">
+                    <div>
+                      <div class="fw-semibold text-primary-emphasis">от 2 490 ₸</div>
+                      <div class="small text-muted"><i class="bi bi-geo-alt"></i> 1.1 км</div>
+                    </div>
+                    <a href="product.html" class="btn btn-outline-primary btn-sm">Смотреть</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col prod-card"
+                 data-title="Шампунь 400 мл"
+                 data-keywords="шампунь шампунь для волос hair shampoo 400ml"
+                 data-price="1790" data-distance="0.4">
+              <div class="card h-100 product-card">
+                <div class="ratio ratio-16x9">
+                  <img src="https://via.placeholder.com/640x360" class="card-img-top img-cover" alt="Шампунь 400 мл">
+                </div>
+                <div class="card-body d-flex flex-column">
+                  <h6 class="card-title js-title mb-1">Шампунь 400 мл</h6>
+                  <div class="text-muted small mb-2">В наличии в 15 магазинах</div>
+                  <div class="mt-auto d-flex align-items-center justify-content-between">
+                    <div>
+                      <div class="fw-semibold text-primary-emphasis">от 1 790 ₸</div>
+                      <div class="small text-muted"><i class="bi bi-geo-alt"></i> 0.4 км</div>
+                    </div>
+                    <a href="product.html" class="btn btn-outline-primary btn-sm">Смотреть</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- добавляй больше карточек по этому шаблону -->
+          </div>
+
+          <!-- Ничего не найдено -->
+          <div id="emptyState" class="text-center text-muted py-5 d-none">
+            <i class="bi bi-search fs-1 d-block mb-2"></i>
+            Ничего не найдено по запросу «<span id="emptyQuery">...</span>».
+            <div class="small">Попробуйте изменить формулировку или убрать часть слов.</div>
+          </div>
+
+          <!-- Пагинация -->
+          <nav class="mt-4">
+            <ul class="pagination justify-content-center" id="pagination"></ul>
+          </nav>
+        </div>
+
+        <!-- MAP VIEW -->
+        <div class="tab-pane fade" id="mapPane" role="tabpanel" aria-labelledby="map-tab">
+          <div class="map-wrapper rounded-3 border shadow-sm">
+            <div class="map-placeholder d-flex align-items-center justify-content-center h-100">
+              <div class="text-center text-muted">
+                <i class="bi bi-map fs-1 d-block mb-2"></i>
+                Карта появится здесь
+                <div class="small">Пины магазинов с ценами и расстоянием</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /tab-content -->
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-top py-4 bg-white">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <span class="text-muted small">© 2025 BarGo</span>
+      <ul class="nav small">
+        <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">Политика конфиденциальности</a></li>
+        <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">Условия</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS (bundle обязателен для табов) -->
+  <script src="bootstrap-5.3.8-dist/js/bootstrap.bundle.js"></script>
+
+  <!-- Поиск + сортировка + пагинация -->
+  <script>
+    const $q = document.getElementById('q');
+    const $form = document.getElementById('searchForm');
+    const $clear = document.getElementById('clearBtn');
+    const $chip = document.getElementById('activeQueryChip');
+    const $sortChip = document.getElementById('activeSortChip');
+    const $clearAll = document.getElementById('clearAll');
+    const $found = document.getElementById('foundCount');
+    const $grid = document.getElementById('cardsGrid');
+    const $empty = document.getElementById('emptyState');
+    const $emptyQuery = document.getElementById('emptyQuery');
+    const $sortSelect = document.getElementById('sortSelect');
+    const $pagination = document.getElementById('pagination');
+
+    const PER_PAGE = 9;          // сколько карточек на страницу
+    let currentPage = 1;
+
+    // Карточки и исходный порядок
+    const allCards = Array.from(document.querySelectorAll('.prod-card')).map((el, idx) => {
+      el.dataset.index = idx;
+      return el;
+    });
+
+    const norm = s => (s || '').toString().trim().toLowerCase();
+
+    // подсветка совпадений
+    function highlightTitle(el, query) {
+      const titleEl = el.querySelector('.js-title');
+      const original = el.dataset.title;
+      if (!query) { titleEl.innerHTML = original; return; }
+      const q = norm(query).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const re = new RegExp(`(${q})`, 'ig');
+      titleEl.innerHTML = original.replace(re, '<mark class="search-highlight">$1</mark>');
+    }
+
+    // оценка релевантности
+    function relevanceScore(el, queryNorm) {
+      if (!queryNorm) return Number(el.dataset.index);
+      const title = norm(el.dataset.title);
+      const kw = norm(el.dataset.keywords);
+      const tPos = title.indexOf(queryNorm);
+      const kPos = kw.indexOf(queryNorm);
+      let pos = 1e9;
+      if (tPos >= 0) pos = Math.min(pos, tPos);
+      if (kPos >= 0) pos = Math.min(pos, kPos + 100); // хуже, чем в title
+      return pos === 1e9 ? 1e9 + Number(el.dataset.index) : pos + Number(el.dataset.index)/1000;
+    }
+
+    // поиск -> список видимых
+    function applySearch(query) {
+      const qn = norm(query);
+      const visible = [];
+
+      allCards.forEach(card => {
+        const title = norm(card.dataset.title);
+        const keywords = norm(card.dataset.keywords);
+        const match = !qn || title.includes(qn) || keywords.includes(qn);
+
+        card.classList.toggle('d-none', !match);           // фильтрация
+        card.classList.remove('d-none-page');              // сброс скрытия пагинации
+        highlightTitle(card, qn ? query : '');
+        if (match) visible.push(card);
+      });
+
+      // UI
+      $found.textContent = visible.length.toString();
+      const showChip = !!qn;
+      $chip.classList.toggle('d-none', !showChip);
+      if (showChip) $chip.textContent = `Запрос: «${query}»`;
+
+      const showClearAll = showChip || $sortSelect.value !== 'relevance';
+      $clearAll.classList.toggle('d-none', !showClearAll);
+
+      const nothing = visible.length === 0;
+      $empty.classList.toggle('d-none', !nothing);
+      if (nothing) $emptyQuery.textContent = query;
+
+      return { qn, visible };
+    }
+
+    // сортировка видимых
+    function applySort(visible, qn) {
+      const mode = $sortSelect.value;
+
+      const sortLabel = {
+        relevance: 'По релевантности',
+        price_asc: 'Цена: сначала дешевле',
+        price_desc: 'Цена: сначала дороже',
+        distance_asc: 'Расстояние: ближайшие',
+        distance_desc: 'Расстояние: дальние',
+      }[mode];
+
+      const showSortChip = mode !== 'relevance';
+      $sortChip.classList.toggle('d-none', !showSortChip);
+      if (showSortChip) $sortChip.textContent = `Сортировка: ${sortLabel}`;
+
+      const cmp = {
+        relevance: (a, b) => relevanceScore(a, qn) - relevanceScore(b, qn),
+        price_asc: (a, b) => (Number(a.dataset.price) - Number(b.dataset.price)) || (Number(a.dataset.index) - Number(b.dataset.index)),
+        price_desc: (a, b) => (Number(b.dataset.price) - Number(a.dataset.price)) || (Number(a.dataset.index) - Number(b.dataset.index)),
+        distance_asc: (a, b) => (Number(a.dataset.distance) - Number(b.dataset.distance)) || (Number(a.dataset.index) - Number(b.dataset.index)),
+        distance_desc: (a, b) => (Number(b.dataset.distance) - Number(a.dataset.distance)) || (Number(a.dataset.index) - Number(b.dataset.index)),
+      }[mode];
+
+      visible.sort(cmp);
+
+      const frag = document.createDocumentFragment();
+      visible.forEach(el => frag.appendChild(el));
+      allCards.filter(el => el.classList.contains('d-none')).forEach(el => frag.appendChild(el));
+      $grid.appendChild(frag);
+
+      return visible;
+    }
+
+    // ---------- Пагинация ----------
+    function buildPagination(total, perPage) {
+      const totalPages = Math.max(1, Math.ceil(total / perPage));
+      currentPage = Math.min(currentPage, totalPages);
+
+      $pagination.innerHTML = '';
+
+      const makeItem = (label, page, disabled=false, active=false) => {
+        const li = document.createElement('li');
+        li.className = `page-item${disabled ? ' disabled' : ''}${active ? ' active' : ''}`;
+        const a = document.createElement('a');
+        a.className = 'page-link';
+        a.href = '#';
+        a.textContent = label;
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (disabled || active) return;
+          currentPage = page;
+          applyAll($q.value, /*keepPage*/true);
+        });
+        li.appendChild(a);
+        return li;
+      };
+
+      // Prev
+      $pagination.appendChild(makeItem('Предыдущая', currentPage - 1, currentPage === 1));
+
+      // Pages (простая версия: показываем до 7 страниц; при большем — можно добавить «...»)
+      const totalPagesToShow = Math.min(7, Math.ceil(total / perPage));
+      for (let p = 1; p <= totalPages; p++) {
+        // если страниц много — показываем «окно» вокруг текущей
+        if (totalPages > 7) {
+          if (p === 1 || p === totalPages || (p >= currentPage - 2 && p <= currentPage + 2)) {
+            $pagination.appendChild(makeItem(String(p), p, false, p === currentPage));
+          } else if (p === 2 && currentPage > 4) {
+            $pagination.appendChild(makeItem('…', currentPage, true, false));
+          } else if (p === totalPages - 1 && currentPage < totalPages - 3) {
+            $pagination.appendChild(makeItem('…', currentPage, true, false));
+          }
+        } else {
+          $pagination.appendChild(makeItem(String(p), p, false, p === currentPage));
+        }
+      }
+
+      // Next
+      $pagination.appendChild(makeItem('Следующая', currentPage + 1, currentPage === totalPages));
+    }
+
+    function applyPage(visible) {
+      // Скрываем элементы, которые не попали на текущую страницу
+      visible.forEach((el, idx) => {
+        const onPage = Math.floor(idx / PER_PAGE) + 1 === currentPage;
+        el.classList.toggle('d-none-page', !onPage);
+      });
+    }
+
+    // Комбинированное применение
+    function applyAll(query, keepPage=false) {
+      if (!keepPage) currentPage = 1;
+      const { qn, visible } = applySearch(query);
+      const sortedVisible = applySort(visible, qn);
+
+      buildPagination(sortedVisible.length, PER_PAGE);
+      applyPage(sortedVisible);
+    }
+
+    // listeners
+    let tId;
+    $q.addEventListener('input', () => {
+      clearTimeout(tId);
+      tId = setTimeout(() => applyAll($q.value), 140);
+    });
+
+    $form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      applyAll($q.value);
+    });
+
+    $clear.addEventListener('click', () => {
+      $q.value = '';
+      $sortSelect.value = 'relevance';
+      applyAll('');
+      $q.focus();
+    });
+
+    $clearAll.addEventListener('click', () => {
+      $q.value = '';
+      $sortSelect.value = 'relevance';
+      applyAll('');
+      $q.focus();
+    });
+
+    $sortSelect.addEventListener('change', () => {
+      applyAll($q.value);
+    });
+
+    // init
+    applyAll('');
+  </script>
+</body>
+</html>
