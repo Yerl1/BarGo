@@ -1,5 +1,5 @@
 # backend/Dockerfile
-FROM golang:1.21-alpine
+FROM golang:1.24-alpine
 
 WORKDIR /app
 
@@ -9,9 +9,6 @@ RUN go mod download
 
 # Copy backend source
 COPY . .
-
-# Copy frontend files into /app/web
-COPY ../web /app/web
 
 # Build Go binary
 RUN go build -o main .
