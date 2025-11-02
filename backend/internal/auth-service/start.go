@@ -1,21 +1,19 @@
 package authservice
 
 import (
-	"bargo/internal/auth-service/adapters/driver/myhttp"
-	"bargo/internal/configs"
-	"bargo/internal/mylogger"
 	"context"
 	"errors"
 	"net/http"
-	"os/signal"
-	"syscall"
+
+	"backend/internal/auth-service/adapters/driver/myhttp"
+	"backend/internal/configs"
+	"backend/internal/mylogger"
 )
 
 func Execute(ctx context.Context, mylog mylogger.Logger, cfg *configs.Config) error {
-	newCtx, close := signal.NotifyContext(ctx, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
-	defer close()
+	log := mylog.With().Str("Execute", "auth-service").Logger()
 
-	server := myhttp.NewServer(newCtx, ctx, mylog, cfg)
+	server := myhttp.NewServer(ctx, mylog, cfg)
 
 	// Run server in goroutine
 	runErrCh := make(chan error, 1)
@@ -25,15 +23,15 @@ func Execute(ctx context.Context, mylog mylogger.Logger, cfg *configs.Config) er
 
 	// Wait for signal or server crash
 	select {
-	case <-newCtx.Done():
-		mylog.Info("Shutdown signal received")
+	case <-ctx.Done():
+		log.Info().Msg("Shutdown signal received")
 		return server.Stop(context.Background())
 	case err := <-runErrCh:
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			mylog.Error("Server failed unexpectedly", err)
+			log.Err(err).Msg("Server failed unexpectedly")
 			return err
 		}
-		mylog.Info("Server exited normally")
+		log.Info().Msg("Server exited normally")
 		return nil
 	}
 }

@@ -1,17 +1,19 @@
 package myhttp
 
 import (
-	"bargo/internal/auth-service/adapters/driven/db"
-	"bargo/internal/configs"
-	"bargo/internal/mylogger"
 	"context"
 	"errors"
 	"fmt"
 	"net/http"
 	"sync"
 	"time"
-	// "bargo/internal/auth-service/adapters/driver/myhttp/handle"
-	// "bargo/internal/auth-service/core/service"
+
+	"backend/internal/auth-service/adapters/driven/db"
+	"backend/internal/auth-service/adapters/driver/myhttp/handlers"
+	"backend/internal/auth-service/adapters/driver/myhttp/middleware"
+	"backend/internal/auth-service/core/services"
+	"backend/internal/configs"
+	"backend/internal/mylogger"
 )
 
 var ErrServerClosed = errors.New("Server closed")
@@ -28,12 +30,13 @@ type Server struct {
 	appCtx context.Context
 	mu     sync.Mutex
 	wg     sync.WaitGroup
+	mdl    *middleware.Middleware
 }
 
-func NewServer(ctx, appCtx context.Context, mylog mylogger.Logger, cfg *configs.Config) *Server {
+func NewServer(ctx context.Context, mylog mylogger.Logger, cfg *configs.Config) *Server {
 	return &Server{
 		ctx:    ctx,
-		appCtx: appCtx,
+		appCtx: context.Background(),
 		cfg:    cfg,
 		mylog:  mylog,
 		mux:    http.NewServeMux(),
@@ -53,17 +56,19 @@ func (s *Server) Run() error {
 	}
 	log.Info().Msg("Successful database connection")
 
+	mdl := middleware.New(s.ctx, s.cfg.App.JwtSecret, s.mylog)
+	s.mdl = mdl
 	// Configure routes and handlers
 	s.Configure()
+
+	log.Debug().Str("port", s.cfg.Srv.AuthServicePort)
 
 	s.mu.Lock()
 	s.srv = &http.Server{
 		Addr:    fmt.Sprintf(":%v", s.cfg.Srv.AuthServicePort),
-		Handler: s.mux,
+		Handler: s.mdl.CorsMiddleware(s.mux),
 	}
 	s.mu.Unlock()
-
-	log.Debug().Str("port", s.cfg.Srv.AuthServicePort)
 
 	log.Info().Msg("server is running")
 	// Start the HTTP server and handle graceful shutdown
@@ -125,6 +130,16 @@ func (s *Server) startHTTPServer() error {
 
 // Configure sets up the HTTP handlers for various APIs including Market Data, Data Mode control, and Health checks.
 func (s *Server) Configure() {
+	authRepo := db.NewAuthRepo(s.ctx, s.db, s.mylog)
+
+	authService := services.NewAuthService(s.ctx, authRepo, s.cfg.App.JwtSecret, s.mylog)
+
+	authHandler := handlers.NewAuthHandler(s.ctx, authService, s.mylog)
+
+	s.mux.Handle("POST /authentification/signup", authHandler.SignupHandler())
+	s.mux.Handle("POST /authentification/login", authHandler.LoginHandler())
+	s.mux.Handle("POST /authentification/auth", s.mdl.Wrap(authHandler.AuthHandler()))
+	s.mux.Handle("GET /authentification/health", authHandler.HealthHandler())
 }
 
 func (s *Server) initializeDatabase() error {

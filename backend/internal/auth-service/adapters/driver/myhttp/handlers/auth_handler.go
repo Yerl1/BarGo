@@ -1,144 +1,95 @@
-package myhttp
+package handlers
 
 import (
 	"context"
-	"crypto/tls"
-	"errors"
-	"fmt"
+	"encoding/json"
 	"net/http"
-	"ride-hail/internal/auth-service/adapters/driven/db"
-	"ride-hail/internal/auth-service/adapters/driver/myhttp/handle"
-	"ride-hail/internal/auth-service/core/service"
-	"ride-hail/internal/config"
-	"ride-hail/internal/mylogger"
-	"sync"
 	"time"
+
+	"backend/internal/auth-service/core/domain/dto"
+	ports "backend/internal/auth-service/core/ports/driver"
+	"backend/internal/mylogger"
 )
 
-var ErrServerClosed = errors.New("Server closed")
-
-const WaitTime = 10
-
-type Server struct {
-	mux    *http.ServeMux
-	cfg    *config.Config
-	srv    *http.Server
-	mylog  mylogger.Logger
-	db     *db.DB
-	ctx    context.Context
-	appCtx context.Context
-	mu     sync.Mutex
-	wg     sync.WaitGroup
+type AuthHandler struct {
+	mylog   mylogger.Logger
+	ctx     context.Context
+	service ports.IAuthService
 }
 
-func NewServer(ctx, appCtx context.Context, mylog mylogger.Logger, cfg *config.Config) *Server {
-	return &Server{
-		ctx:    ctx,
-		appCtx: appCtx,
-		cfg:    cfg,
-		mylog:  mylog,
-		mux:    http.NewServeMux(),
+func NewAuthHandler(ctx context.Context, service ports.IAuthService, mylog mylogger.Logger) *AuthHandler {
+	return &AuthHandler{
+		ctx:     ctx,
+		service: service,
+		mylog:   mylog,
 	}
 }
 
-// Run initializes routes and starts listening. It returns when the server stops.
-func (s *Server) Run() error {
-	mylog := s.mylog.Action("server_started")
-	// Initialize database connection
-	if err := s.initializeDatabase(); err != nil {
-		mylog.Action("db_connection_failed").Error("Failed to connect to database", err)
-		return err
-	}
-	mylog.Action("db_connected").Info("Successful database connection")
+func (h *AuthHandler) SignupHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Handle user signup
+		log := h.mylog.With().Str("handler", "SignupHandler").Logger()
 
-	// Configure routes and handlers
-	s.Configure()
-
-	cert, err := tls.LoadX509KeyPair(s.cfg.App.CertPath, s.cfg.App.CertKeyPath)
-	if err != nil {
-		return fmt.Errorf("failed to load TLS cert/key: %w", err)
-	}
-
-	tlsConfig := &tls.Config{
-		Certificates: []tls.Certificate{cert},
-		MinVersion:   tls.VersionTLS12,
-	}
-	s.mu.Lock()
-	s.srv = &http.Server{
-		Addr:      fmt.Sprintf(":%v", s.cfg.Srv.AuthServicePort),
-		Handler:   s.mux,
-		TLSConfig: tlsConfig,
-	}
-	s.mu.Unlock()
-
-	mylog = mylog.WithGroup("details").With("port", s.cfg.Srv.AuthServicePort)
-
-	mylog.Info("server is running")
-	// Start the HTTP server and handle graceful shutdown
-	return s.startHTTPServer()
-}
-
-// Stop provides a programmatic shutdown. Accepts a context for timeout control.
-func (s *Server) Stop(ctx context.Context) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.mylog.Action("graceful_shutdown_started").Info("Shutting down HTTP server...")
-
-	s.wg.Wait()
-
-	if s.srv != nil {
-		shutdownCtx, cancel := context.WithTimeout(ctx, WaitTime*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 		defer cancel()
 
-		if err := s.srv.Shutdown(shutdownCtx); err != nil {
-			s.mylog.Action("graceful_shutdown_failed").Error("Failed to shut down HTTP server gracefully", err)
-			return fmt.Errorf("http server shutdown: %w", err)
+		var user dto.SignupUser
+
+		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+			log.Error().Err(err).Msg("Failed to decode request body")
+			JsonResponse(w, "Invalid request body", http.StatusBadRequest)
+			return
 		}
-	}
 
-	if s.db != nil {
-		if err := s.db.Close(); err != nil {
-			s.mylog.Action("db_close_failed").Error("Failed to close database", err)
-			return fmt.Errorf("db close: %w", err)
+		resp, err := h.service.Signup(ctx, &user)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to signup user")
+			JsonResponse(w, "Failed to signup user", http.StatusInternalServerError)
+			return
 		}
-		s.mylog.Action("db_closed").Info("Database closed")
-	}
+		log.Info().Msg("User signed up successfully")
 
-	s.mylog.Action("graceful_shutdown_completed").Info("HTTP server shut down gracefully")
-
-	return nil
-}
-
-func (s *Server) startHTTPServer() error {
-	errCh := make(chan error, 1)
-
-	go func() {
-		if err := s.srv.ListenAndServeTLS(s.cfg.App.CertPath, s.cfg.App.CertKeyPath); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			errCh <- err
-		} else {
-			errCh <- nil
-		}
-	}()
-
-	select {
-	case <-s.ctx.Done():
-		return nil
-	case err := <-errCh:
-		return err
+		JsonResponse(w, resp, http.StatusCreated)
 	}
 }
 
-// Configure sets up the HTTP handlers for various APIs including Market Data, Data Mode control, and Health checks.
-func (s *Server) Configure() {
-	// Repositories and services
+func (h *AuthHandler) LoginHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Handle user login
+		log := h.mylog.With().Str("handler", "LoginHandler").Logger()
+
+		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+		defer cancel()
+
+		var user dto.LoginUser
+
+		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+			log.Error().Err(err).Msg("Failed to decode request body")
+			JsonResponse(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		resp, err := h.service.Login(ctx, &user)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to login user")
+			JsonResponse(w, "Failed to login user", http.StatusInternalServerError)
+			return
+		}
+		log.Info().Msg("User signed up successfully")
+
+		JsonResponse(w, resp, http.StatusCreated)
+	}
 }
 
-func (s *Server) initializeDatabase() error {
-	db, err := db.Start(s.ctx, s.cfg.DB, s.mylog)
-	if err != nil {
-		return fmt.Errorf("failed to connect to database: %w", err)
+func (h *AuthHandler) HealthHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
 	}
-	s.db = db
-	return nil
+}
+
+func (h *AuthHandler) AuthHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Handle user auth
+	}
 }

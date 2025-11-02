@@ -7,24 +7,14 @@ db:
   database: bargo_db
   max_retries: 5
 
-# Services HTTP Ports
-services:
-  business_http_port: 3000
-  consumer_http_port: 3001
-  admin_http_port: 3002
-  auth_http_port: 3003
-
-# Services
-service_ports:
+# HTTP Ports
+srv:
   business_service: 3000
   consumer_service: 3001
   admin_service: 3002
   auth_service: 3003
+  web_service: 8080
 
 # JWT Tokens
 app:
   jwt_secret: "GoldenFoxy_KeepOut!_!_xo"
-
-# CERT Path (Commented out)
-# cert_path: server.crt
-# cert_key_path: server.key

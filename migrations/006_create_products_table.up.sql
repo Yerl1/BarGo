@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS products (
+  product_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  store_id UUID REFERENCES stores(store_id),
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  photo TEXT,
+  price NUMERIC(10, 2) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);

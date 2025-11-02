@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
-	as "backend/internal/auth-service"
 	"backend/internal/configs"
 	"backend/internal/mylogger"
 )
@@ -28,7 +28,7 @@ func main() {
 	// -----------------------------
 	// Initialize Zerolog-based logger
 	// -----------------------------
-	logger, err := mylogger.New("auth-service", "debug") // could be cfg.App.LogLevel if you add one
+	logger, err := mylogger.New("web-service", "debug") // could be cfg.App.LogLevel if you add one
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: failed to init logger: %v\n", err)
 		os.Exit(1)
@@ -37,11 +37,12 @@ func main() {
 	logger.Info().Msg("✅ Service starting up...")
 	logger.Debug().Interface("config", cfg).Msg("Loaded configuration")
 
-	// -----------------------------
-	// Run CLI logic
-	// -----------------------------
-	if err := as.Execute(ctx, *logger, cfg); err != nil {
-		stop()
+	fs := http.FileServer(http.Dir("/app/web"))
+	http.Handle("/", fs)
+
+	logger.Info().Msgf("Starting web service on port %s", cfg.Srv.WebServicePort)
+	if err := http.ListenAndServe(":"+cfg.Srv.WebServicePort, nil); err != nil {
+		logger.Fatal().Err(err).Msg("Failed to start web service")
 	}
 
 	logger.Info().Msg("🛑 Shutdown signal received, cleaning up...")

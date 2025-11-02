@@ -4,8 +4,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN go build -o auth-service ./backend/cmd/auth-service/main.go
+RUN cd backend && go build -o /app/auth-service ./cmd/auth-service/main.go
 
 EXPOSE 3000
 
-CMD ["./auth-service", "--mode=au"]
+CMD ["./auth-service"]

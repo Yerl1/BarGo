@@ -9,7 +9,7 @@ import (
 
 type Config struct {
 	DB  *DBconfig
-	Srv *Serviceconfig
+	Srv *ServicePorts
 	App *App
 }
 
@@ -22,11 +22,12 @@ type DBconfig struct {
 	MaxRetries int    `yaml:"max_retries"`
 }
 
-type Serviceconfig struct {
+type ServicePorts struct {
 	BusinessServicePort string `yaml:"business_service"`
 	ConsumerServicePort string `yaml:"consumer_service"`
 	AdminServicePort    string `yaml:"admin_service"`
 	AuthServicePort     string `yaml:"auth_service"`
+	WebServicePort      string `yaml:"web_service"`
 }
 
 type App struct {

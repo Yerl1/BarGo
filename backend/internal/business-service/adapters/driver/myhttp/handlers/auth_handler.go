@@ -2,13 +2,10 @@ package myhttp
 
 import (
 	"context"
-	"crypto/tls"
 	"errors"
 	"fmt"
 	"net/http"
 	"ride-hail/internal/auth-service/adapters/driven/db"
-	"ride-hail/internal/auth-service/adapters/driver/myhttp/handle"
-	"ride-hail/internal/auth-service/core/service"
 	"ride-hail/internal/config"
 	"ride-hail/internal/mylogger"
 	"sync"
@@ -54,20 +51,10 @@ func (s *Server) Run() error {
 	// Configure routes and handlers
 	s.Configure()
 
-	cert, err := tls.LoadX509KeyPair(s.cfg.App.CertPath, s.cfg.App.CertKeyPath)
-	if err != nil {
-		return fmt.Errorf("failed to load TLS cert/key: %w", err)
-	}
-
-	tlsConfig := &tls.Config{
-		Certificates: []tls.Certificate{cert},
-		MinVersion:   tls.VersionTLS12,
-	}
 	s.mu.Lock()
 	s.srv = &http.Server{
-		Addr:      fmt.Sprintf(":%v", s.cfg.Srv.AuthServicePort),
-		Handler:   s.mux,
-		TLSConfig: tlsConfig,
+		Addr:    fmt.Sprintf(":%v", s.cfg.Srv.AuthServicePort),
+		Handler: s.mux,
 	}
 	s.mu.Unlock()
 
