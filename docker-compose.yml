@@ -1,11 +1,173 @@
 version: "3.9"
 
 services:
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+  # ------------------------------
+  # PostgreSQL Database
+  # ------------------------------
+  postgres:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: bargo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-pass}
+      POSTGRES_DB: ${DB_NAME:-bargo_db}
     ports:
-      - "8080:8080"
+      - "5432:5432"
     volumes:
-      - ./web:/app/web  # optional, for live reload during development
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-user} -d ${DB_NAME:-bargo_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ------------------------------
+  # Database Migration Service
+  # ------------------------------
+  migrate:
+    image: migrate/migrate:v4.15.2
+    container_name: migrate
+    restart: on-failure
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./migrations:/migrations
+    command: [
+      "-path", "/migrations/",
+      "-database",
+      "postgres://${DB_USER:-user}:${DB_PASSWORD:-pass}@postgres:${DB_PORT:-5432}/${DB_NAME:-bargo_db}?sslmode=disable",
+      "up"
+    ]
+    env_file:
+      - .env
+
+  # ------------------------------
+  # Authentication Service
+  # ------------------------------
+  auth-service:
+    build:
+      context: .
+      dockerfile: docker/auth-service.Dockerfile
+    container_name: bargo-auth
+    env_file: .env
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - "${AUTH_HTTP_PORT:-3003}:3003"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+#   # ------------------------------
+#   # Admin Service
+#   # ------------------------------
+#   admin-service:
+#     build:
+#       context: .
+#       dockerfile: docker/admin-service.Dockerfile
+#     container_name: bargo-admin
+#     env_file: .env
+#     volumes:
+#       - ./logs:/app/logs
+#     depends_on:
+#       postgres:
+#         condition: service_healthy
+#       migrate:
+#         condition: service_completed_successfully
+#     ports:
+#       - "${ADMIN_HTTP_PORT:-3002}:3002"
+#     restart: unless-stopped
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+
+#   # ------------------------------
+#   # Business Service
+#   # ------------------------------
+#   business-service:
+#     build:
+#       context: .
+#       dockerfile: docker/business-service.Dockerfile
+#     container_name: bargo-business
+#     env_file: .env
+#     volumes:
+#       - ./logs:/app/logs
+#     depends_on:
+#       postgres:
+#         condition: service_healthy
+#       migrate:
+#         condition: service_completed_successfully
+#     ports:
+#       - "${BUSINESS_HTTP_PORT:-3000}:3000"
+#     restart: unless-stopped
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+
+#   # ------------------------------
+#   # Consumer Service
+#   # ------------------------------
+#   consumer-service:
+#     build:
+#       context: .
+#       dockerfile: docker/consumer-service.Dockerfile
+#     container_name: bargo-consumer
+#     env_file: .env
+#     volumes:
+#       - ./logs:/app/logs
+#     depends_on:
+#       postgres:
+#         condition: service_healthy
+#       migrate:
+#         condition: service_completed_successfully
+#     ports:
+#       - "${CONSUMER_HTTP_PORT:-3001}:3001"
+#     restart: unless-stopped
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+
+#   # ------------------------------
+#   # Backend (Optional Web API Gateway)
+#   # ------------------------------
+#   backend:
+#     build:
+#       context: ./backend
+#       dockerfile: ../docker/Dockerfile
+#     container_name: bargo-backend
+#     ports:
+#       - "8080:8080"
+#     volumes:
+#       - ./web:/app/web
+#     depends_on:
+#       - auth-service
+#       - admin-service
+#       - business-service
+#       - consumer-service
+#     restart: unless-stopped
+
+# # ------------------------------
+# # Networks & Volumes
+# # ------------------------------
+# volumes:
+#   postgres_data:
+
+# networks:
+#   default:
+#     driver: bridge
