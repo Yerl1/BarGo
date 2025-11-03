@@ -1,0 +1,11 @@
+# Car (port 5000)
+sudo docker run -t -i -p 5000:5000 -v "${PWD}/car:/data" ghcr.io/project-osrm/osrm-backend \
+  osrm-routed --algorithm mld /data/kazakhstan-251102.osrm
+
+# Bicycle (port 5001)
+sudo docker run -t -i -p 5001:5000 -v "${PWD}/bike:/data" ghcr.io/project-osrm/osrm-backend \
+  osrm-routed --algorithm mld /data/kazakhstan-251102.osrm
+
+# Foot (port 5002)
+sudo docker run -t -i -p 5002:5000 -v "${PWD}/foot:/data" ghcr.io/project-osrm/osrm-backend \
+  osrm-routed --algorithm mld /data/kazakhstan-251102.osrm

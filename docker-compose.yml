@@ -162,6 +162,57 @@ services:
     volumes:
       - ./web:/app/web:ro
 
+  # ------------------------------
+  # OSRM - Car Profile
+  # ------------------------------
+  osrm-car:
+    image: ghcr.io/project-osrm/osrm-backend
+    container_name: osrm-car
+    command: osrm-routed --algorithm mld /data/kazakhstan-251102.osrm
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./map_data/car:/data
+    restart: unless-stopped
+
+  # ------------------------------
+  # OSRM - Bicycle Profile
+  # ------------------------------
+  osrm-bike:
+    image: ghcr.io/project-osrm/osrm-backend
+    container_name: osrm-bike
+    command: osrm-routed --algorithm mld /data/kazakhstan-251102.osrm
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./map_data/bike:/data
+    restart: unless-stopped
+
+  # ------------------------------
+  # OSRM - Foot Profile
+  # ------------------------------
+  osrm-foot:
+    image: ghcr.io/project-osrm/osrm-backend
+    container_name: osrm-foot
+    command: osrm-routed --algorithm mld /data/kazakhstan-251102.osrm
+    ports:
+      - "5002:5000"
+    volumes:
+      - ./map_data/foot:/data
+    restart: unless-stopped
+
+  # ------------------------------
+  # Tile Server (Vector & Raster Maps)
+  # ------------------------------
+  tileserver:
+    image: klokantech/tileserver-gl
+    container_name: tileserver
+    ports:
+      - "8081:80"
+    volumes:
+      - ./map_data:/data
+    restart: unless-stopped
+
 # ------------------------------
 # Networks & Volumes
 # ------------------------------
