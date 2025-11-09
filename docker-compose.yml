@@ -64,103 +64,92 @@ services:
       migrate:
         condition: service_completed_successfully
     ports:
-      - "${AUTH_HTTP_PORT:-3003}:3003"
+      - "${AUTH_HTTP_PORT:-3004}:3004"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3004/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    #   # ------------------------------
+    #   # Business Service
+    #   # ------------------------------
+  business-service:
+    build:
+      context: .
+      dockerfile: docker/business-service.Dockerfile
+    container_name: bargo-business
+    env_file: .env
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - "${BUSINESS_HTTP_PORT:-3003}:3003"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3003/health"]
       interval: 10s
       timeout: 5s
       retries: 5
-  #   # ------------------------------
-  #   # Admin Service
-  #   # ------------------------------
-  #   admin-service:
-  #     build:
-  #       context: .
-  #       dockerfile: docker/admin-service.Dockerfile
-  #     container_name: bargo-admin
-  #     env_file: .env
-  #     volumes:
-  #       - ./logs:/app/logs
-  #     depends_on:
-  #       postgres:
-  #         condition: service_healthy
-  #       migrate:
-  #         condition: service_completed_successfully
-  #     ports:
-  #       - "${ADMIN_HTTP_PORT:-3002}:3002"
-  #     restart: unless-stopped
-  #     healthcheck:
-  #       test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
-  #       interval: 10s
-  #       timeout: 5s
-  #       retries: 5
 
-  #   # ------------------------------
-  #   # Business Service
-  #   # ------------------------------
-  #   business-service:
-  #     build:
-  #       context: .
-  #       dockerfile: docker/business-service.Dockerfile
-  #     container_name: bargo-business
-  #     env_file: .env
-  #     volumes:
-  #       - ./logs:/app/logs
-  #     depends_on:
-  #       postgres:
-  #         condition: service_healthy
-  #       migrate:
-  #         condition: service_completed_successfully
-  #     ports:
-  #       - "${BUSINESS_HTTP_PORT:-3000}:3000"
-  #     restart: unless-stopped
-  #     healthcheck:
-  #       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-  #       interval: 10s
-  #       timeout: 5s
-  #       retries: 5
-
-  #   # ------------------------------
-  #   # Consumer Service
-  #   # ------------------------------
-  #   consumer-service:
-  #     build:
-  #       context: .
-  #       dockerfile: docker/consumer-service.Dockerfile
-  #     container_name: bargo-consumer
-  #     env_file: .env
-  #     volumes:
-  #       - ./logs:/app/logs
-  #     depends_on:
-  #       postgres:
-  #         condition: service_healthy
-  #       migrate:
-  #         condition: service_completed_successfully
-  #     ports:
-  #       - "${CONSUMER_HTTP_PORT:-3001}:3001"
-  #     restart: unless-stopped
-  #     healthcheck:
-  #       test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
-  #       interval: 10s
-  #       timeout: 5s
-  #       retries: 5
+    #   # ------------------------------
+    #   # Consumer Service
+    #   # ------------------------------
+  consumer-service:
+    build:
+      context: .
+      dockerfile: docker/consumer-service.Dockerfile
+    container_name: bargo-consumer
+    env_file: .env
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - "${CONSUMER_HTTP_PORT:-3002}:3002"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # ------------------------------
   # Backend (Optional Web API Gateway)
   # ------------------------------
-  web-service:
+  consumer-web-service:
     build:
       context: .
-      dockerfile: docker/web-service.Dockerfile
-    container_name: bargo-web
+      dockerfile: docker/consumer-web-service.Dockerfile
+    container_name: consumer-web
     ports:
-      - "${WEB_HTTP_PORT:-8080}:8080"
+      - "${CONSUMER_WEB_HTTP_PORT:-3000}:3000"
     depends_on:
       - auth-service
     restart: unless-stopped
     volumes:
-      - ./web:/app/web:ro
+      - ./web/consumer:/app/web/consumer:ro
+
+  business-web-service:
+    build:
+      context: .
+      dockerfile: docker/business-web-service.Dockerfile
+    container_name: business-web
+    ports:
+      - "${BUSINESS_WEB_HTTP_PORT:-3001}:3001"
+    depends_on:
+      - auth-service
+    restart: unless-stopped
+    volumes:
+      - ./web/business:/app/web/business:ro
 
   # ------------------------------
   # OSRM - Car Profile

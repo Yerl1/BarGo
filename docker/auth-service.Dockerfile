@@ -6,6 +6,6 @@ COPY . .
 
 RUN cd backend && go build -o /app/auth-service ./cmd/auth-service/main.go
 
-EXPOSE 3000
+EXPOSE 3004
 
 CMD ["./auth-service"]

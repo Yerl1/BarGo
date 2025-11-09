@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Товар — BarGo</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <style>
+      :root {
+        --primary-color: #28a745;
+      }
+
+      body {
+        background-color: #f8f9fa;
+      }
+
+      .navbar-brand {
+        font-weight: bold;
+        color: var(--primary-color) !important;
+        font-size: 1.5rem;
+      }
+
+      .product-section {
+        background-color: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .product-photo {
+        background-color: #e9ecef;
+        border-radius: 12px;
+        min-height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #6c757d;
+        overflow: hidden;
+      }
+
+      .product-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .info-box {
+        background-color: #e9ecef;
+        border-radius: 12px;
+        padding: 1.5rem;
+        min-height: 200px;
+      }
+
+      .info-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+      }
+
+      .info-content {
+        color: #212529;
+        font-size: 1.1rem;
+      }
+
+      .map-container {
+        background-color: #e9ecef;
+        border-radius: 12px;
+        height: 450px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      #map {
+        width: 100%;
+        height: 100%;
+        border-radius: 12px;
+      }
+
+      .store-list {
+        max-height: 450px;
+        overflow-y: auto;
+      }
+
+      .store-card {
+        background-color: white;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid #dee2e6;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+
+      .store-card:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+      }
+
+      .store-name {
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.5rem;
+      }
+
+      .store-distance {
+        color: #6c757d;
+        font-size: 0.9rem;
+      }
+
+      .store-price {
+        font-weight: 700;
+        color: var(--primary-color);
+        font-size: 1.2rem;
+      }
+
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: #343a40;
+        padding: 1rem 0;
+        z-index: 1000;
+      }
+
+      .bottom-nav-item {
+        color: white;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+      }
+
+      .bottom-nav-item:hover {
+        color: var(--primary-color);
+      }
+
+      .bottom-nav-item i {
+        font-size: 1.5rem;
+      }
+
+      .content-wrapper {
+        padding-bottom: 80px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav
+      class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top"
+    >
+      <div class="container">
+        <a
+          class="navbar-brand d-flex align-items-center gap-2"
+          href="index.html"
+        >
+          <i class="bi bi-geo-alt" style="color: var(--primary-color)"></i>
+          <span>BarGo</span>
+        </a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="index.html">Поиск</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">О нас</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Контакты</a>
+            </li>
+            <li class="nav-item dropdown ms-3">
+              <a
+                class="nav-link dropdown-toggle d-flex align-items-center gap-2"
+                href="#"
+                id="userButton"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                <img
+                  src="https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3485.jpg"
+                  alt="User"
+                  class="rounded-circle"
+                  width="32"
+                  height="32"
+                />
+                <span class="fw-semibold" id="userName">Гость</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end shadow">
+                <li>
+                  <a class="dropdown-item" href="#"
+                    ><i class="bi bi-pencil-square me-2"></i>Профиль</a
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item text-danger" href="#"
+                    ><i class="bi bi-box-arrow-right me-2"></i>Выйти</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+      <div class="container py-4">
+        <!-- Product Info Section -->
+        <div class="product-section">
+          <div class="row g-4">
+            <!-- Product Photo -->
+            <div class="col-lg-5">
+              <div class="product-photo" id="productPhoto">
+                <img
+                  src=""
+                  alt="Product Photo"
+                  class="d-none"
+                  id="productImage"
+                />
+                <span id="photoPlaceholder">Product Photo</span>
+              </div>
+            </div>
+
+            <!-- Product Details -->
+            <div class="col-lg-7">
+              <div class="mb-4">
+                <label class="info-label">Name</label>
+                <input
+                  type="text"
+                  class="form-control form-control-lg"
+                  id="productName"
+                  readonly
+                />
+              </div>
+
+              <div>
+                <label class="info-label">Description</label>
+                <textarea
+                  class="form-control"
+                  id="productDescription"
+                  rows="8"
+                  readonly
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="product-section">
+          <label class="info-label mb-3">Info</label>
+          <div class="info-box">
+            <div class="row g-3" id="productInfo">
+              <div class="col-md-3">
+                <div class="small text-muted">Категория</div>
+                <div class="fw-semibold">Electronics</div>
+              </div>
+              <div class="col-md-3">
+                <div class="small text-muted">Средняя цена</div>
+                <div class="fw-semibold text-success">1,290 ₸</div>
+              </div>
+              <div class="col-md-3">
+                <div class="small text-muted">В наличии</div>
+                <div class="fw-semibold">12 магазинов</div>
+              </div>
+              <div class="col-md-3">
+                <div class="small text-muted">Производитель</div>
+                <div class="fw-semibold">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Map and Stores Section -->
+        <div class="product-section">
+          <label class="info-label mb-3">Map</label>
+          <div class="row g-4">
+            <div class="col-lg-7">
+              <div class="map-container">
+                <div id="map"></div>
+              </div>
+            </div>
+            <div class="col-lg-5">
+              <div class="store-list" id="storeList">
+                <!-- Store cards will be generated here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav d-md-none">
+      <div class="container">
+        <div class="row text-center">
+          <div class="col">
+            <a href="index.html" class="bottom-nav-item">
+              <i class="bi bi-house"></i>
+              <span>Home</span>
+            </a>
+          </div>
+          <div class="col">
+            <a href="#" class="bottom-nav-item">
+              <i class="bi bi-search"></i>
+              <span>Search</span>
+            </a>
+          </div>
+          <div class="col">
+            <a href="#" class="bottom-nav-item">
+              <i class="bi bi-cart3"></i>
+              <span>Cart</span>
+            </a>
+          </div>
+          <div class="col">
+            <a href="#" class="bottom-nav-item">
+              <i class="bi bi-person"></i>
+              <span>Profile</span>
+            </a>
+          </div>
+          <div class="col">
+            <a href="#" class="bottom-nav-item">
+              <i class="bi bi-three-dots"></i>
+              <span>More</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+      // Sample product data
+      const products = {
+        1: {
+          name: "Щелочные батарейки AA (4 шт.)",
+          description:
+            "Высококачественные щелочные батарейки AA. Длительный срок службы, подходят для устройств с высоким энергопотреблением. В упаковке 4 штуки.",
+          category: "Электроника",
+          avgPrice: 1290,
+          storesCount: 12,
+          manufacturer: "Duracell",
+          image:
+            "https://simg.marwin.kz/media/catalog/product/cache/8d1771fdd19ec2393e47701ba45e606d/1/_/batarea_duracell_aa_alkaline_2_sht_shk_163.jpg",
+          stores: [
+            {
+              name: 'Магазин "Электро+"',
+              distance: 0.7,
+              price: 1290,
+              lat: 51.1605,
+              lng: 71.4704,
+            },
+            {
+              name: 'Супермаркет "Гросс"',
+              distance: 1.2,
+              price: 1350,
+              lat: 51.1655,
+              lng: 71.4754,
+            },
+            {
+              name: 'Магазин "Техно"',
+              distance: 2.1,
+              price: 1280,
+              lat: 51.1555,
+              lng: 71.4654,
+            },
+          ],
+        },
+        2: {
+          name: "Кофе молотый 250 г",
+          description:
+            "Натуральный молотый кофе из отборных зерен арабики. Средняя обжарка, насыщенный аромат и богатый вкус. Идеально подходит для заваривания в турке или кофеварке.",
+          category: "Продукты питания",
+          avgPrice: 2490,
+          storesCount: 8,
+          manufacturer: "Jacobs",
+          image:
+            "https://minio.clevermart.kz/food/images/2022/7/11/86949c17-c62b-48b2-b227-ff493f684e02/M_8000070018877_1.png",
+          stores: [
+            {
+              name: 'Супермаркет "Гросс"',
+              distance: 1.1,
+              price: 2490,
+              lat: 51.1655,
+              lng: 71.4754,
+            },
+            {
+              name: 'Продукты "Свежесть"',
+              distance: 1.8,
+              price: 2550,
+              lat: 51.1705,
+              lng: 71.4804,
+            },
+            {
+              name: 'Магазин "Вкуснотека"',
+              distance: 2.5,
+              price: 2480,
+              lat: 51.1505,
+              lng: 71.4604,
+            },
+          ],
+        },
+        3: {
+          name: "Шампунь 400 мл",
+          description:
+            "Восстанавливающий шампунь для всех типов волос. Содержит натуральные масла и витамины. Бережно очищает, питает и укрепляет волосы, придает им здоровый блеск.",
+          category: "Косметика",
+          avgPrice: 1790,
+          storesCount: 15,
+          manufacturer: "Head & Shoulders",
+          image:
+            "https://cosmart.kz/upload/dev2fun.imagecompress/webp/iblock/a7d/sky8fyu4lfip6b70lu32muo105ais9cp.webp",
+          stores: [
+            {
+              name: 'Аптека "Здоровье"',
+              distance: 0.4,
+              price: 1790,
+              lat: 51.1705,
+              lng: 71.4654,
+            },
+            {
+              name: 'Косметика "Красота"',
+              distance: 0.9,
+              price: 1850,
+              lat: 51.1755,
+              lng: 71.4704,
+            },
+            {
+              name: 'Супермаркет "Гросс"',
+              distance: 1.2,
+              price: 1780,
+              lat: 51.1655,
+              lng: 71.4754,
+            },
+          ],
+        },
+      };
+
+      // Get product ID from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get("id") || "1";
+      const product = products[productId];
+
+      // Initialize map
+      let map;
+      let markers = [];
+
+      function initMap() {
+        // Center of Astana
+        map = L.map("map").setView([51.1605, 71.4704], 13);
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "© OpenStreetMap contributors",
+        }).addTo(map);
+
+        // Add markers for stores
+        if (product && product.stores) {
+          product.stores.forEach((store, index) => {
+            const marker = L.marker([store.lat, store.lng]).addTo(map)
+              .bindPopup(`
+                            <b>${store.name}</b><br>
+                            ${store.price.toLocaleString()} ₸<br>
+                            ${store.distance} км
+                        `);
+
+            markers.push(marker);
+          });
+        }
+      }
+
+      // Populate product data
+      function loadProductData() {
+        if (!product) {
+          document.getElementById("productName").value = "Товар не найден";
+          return;
+        }
+
+        // Set product name and description
+        document.getElementById("productName").value = product.name;
+        document.getElementById("productDescription").value =
+          product.description;
+
+        // Set product image
+        if (product.image) {
+          const img = document.getElementById("productImage");
+          img.src = product.image;
+          img.classList.remove("d-none");
+          document.getElementById("photoPlaceholder").classList.add("d-none");
+        }
+
+        // Set product info
+        document.getElementById("productInfo").innerHTML = `
+                <div class="col-md-3">
+                    <div class="small text-muted">Категория</div>
+                    <div class="fw-semibold">${product.category}</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="small text-muted">Средняя цена</div>
+                    <div class="fw-semibold text-success">${product.avgPrice.toLocaleString()} ₸</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="small text-muted">В наличии</div>
+                    <div class="fw-semibold">${
+                      product.storesCount
+                    } магазинов</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="small text-muted">Производитель</div>
+                    <div class="fw-semibold">${product.manufacturer}</div>
+                </div>
+            `;
+
+        // Populate store list
+        const storeList = document.getElementById("storeList");
+        storeList.innerHTML = product.stores
+          .map(
+            (store, index) => `
+                <div class="store-card" onclick="focusStore(${index})">
+                    <div class="store-name">${store.name}</div>
+                    <div class="store-distance">
+                        <i class="bi bi-geo-alt"></i> ${
+                          store.distance
+                        } км от вас
+                    </div>
+                    <div class="store-price mt-2">${store.price.toLocaleString()} ₸</div>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      // Focus on store marker
+      function focusStore(index) {
+        const store = product.stores[index];
+        map.setView([store.lat, store.lng], 15);
+        markers[index].openPopup();
+      }
+
+      // Initialize page
+      document.addEventListener("DOMContentLoaded", function () {
+        loadProductData();
+
+        // Initialize map after a short delay to ensure container is ready
+        setTimeout(() => {
+          initMap();
+        }, 100);
+      });
+    </script>
+  </body>
+</html>

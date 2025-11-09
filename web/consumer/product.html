@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BarGo — Информация о товаре</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="bootstrap-5.3.8-dist/css/bootstrap.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav
+      class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top"
+    >
+      <div class="container">
+        <a
+          class="navbar-brand fw-bold d-flex align-items-center gap-2"
+          href="index.html"
+        >
+          <i class="bi bi-geo-alt brand-geo"></i><span>BarGo</span>
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#topbar"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="topbar">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="index.html">Поиск</a>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="#">О нас</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Контакты</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Product section -->
+    <section class="py-4 section-soft border-bottom">
+      <div class="container">
+        <nav class="small mb-2" aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="index.html">Главная</a></li>
+            <li class="breadcrumb-item active">...</li>
+          </ol>
+        </nav>
+
+        <div class="row g-4 align-items-start">
+          <div class="col-12 col-lg-5">
+            <div
+              class="ratio ratio-16x9 rounded-3 overflow-hidden shadow-sm bg-white"
+            >
+              <img src="placeholder.jpg" class="img-cover" alt="Товар" />
+            </div>
+          </div>
+          <div class="col-12 col-lg-7">
+            <h1 class="h4 mb-2">...</h1>
+            <div class="text-muted mb-3 js-meta">Артикул: —</div>
+            <p class="mb-3 js-desc">Загрузка описания...</p>
+            <div class="d-flex flex-wrap gap-3 align-items-center">
+              <span class="fs-5 fw-semibold text-primary-emphasis">от — ₸</span>
+              <span class="badge bg-chip"
+                >В наличии в <span id="storesCountTop">—</span> магазинах</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Controls -->
+    <section class="py-3 controls-sticky bg-white border-bottom">
+      <div class="container d-flex flex-wrap align-items-center gap-3">
+        <div class="text-muted small">
+          Найдено магазинов: <strong id="storesFound">—</strong>
+        </div>
+
+        <div class="input-group input-group-sm" style="max-width: 360px">
+          <span class="input-group-text"><i class="bi bi-shop"></i></span>
+          <input
+            id="shopQuery"
+            type="text"
+            class="form-control"
+            placeholder="Найти магазин по названию"
+          />
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <label class="small text-muted mb-0">Цена:</label>
+          <input
+            type="number"
+            id="minPrice"
+            class="form-control form-control-sm"
+            style="width: 110px"
+            placeholder="Мин"
+          />
+          <input
+            type="number"
+            id="maxPrice"
+            class="form-control form-control-sm"
+            style="width: 110px"
+            placeholder="Макс"
+          />
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <label class="small text-muted mb-0">Дистанция:</label>
+          <input
+            type="number"
+            id="maxDist"
+            class="form-control form-control-sm"
+            style="width: 100px"
+            placeholder="5"
+          />
+          <span class="small text-muted">км</span>
+        </div>
+
+        <select
+          id="sortShops"
+          class="form-select form-select-sm ms-auto"
+          style="max-width: 240px"
+        >
+          <option value="price_asc">Цена: сначала дешевле</option>
+          <option value="price_desc">Цена: сначала дороже</option>
+          <option value="distance_asc" selected>Расстояние: ближайшие</option>
+          <option value="distance_desc">Расстояние: дальние</option>
+        </select>
+
+        <ul class="nav nav-pills ms-2" id="viewTabs" role="tablist">
+          <li class="nav-item">
+            <button
+              class="nav-link active"
+              id="list-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#listPane"
+            >
+              <i class="bi bi-list"></i> Список
+            </button>
+          </li>
+          <li class="nav-item">
+            <button
+              class="nav-link"
+              id="map-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#mapPane"
+            >
+              <i class="bi bi-map"></i> Карта
+            </button>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Stores section -->
+    <section class="py-4">
+      <div class="container">
+        <div class="tab-content">
+          <div class="tab-pane fade show active" id="listPane">
+            <div id="shopsList" class="row row-cols-1 row-cols-md-2 g-3"></div>
+
+            <div id="shopsEmpty" class="text-center text-muted py-5 d-none">
+              <i class="bi bi-search fs-1 d-block mb-2"></i>
+              Под условия не подходит ни один магазин.
+            </div>
+          </div>
+
+          <div class="tab-pane fade" id="mapPane">
+            <div class="map-wrapper rounded-3 border shadow-sm">
+              <div
+                class="map-placeholder d-flex align-items-center justify-content-center h-100"
+              >
+                <div class="text-center text-muted">
+                  <i class="bi bi-map fs-1 d-block mb-2"></i>
+                  Здесь будет карта с пинами магазинов и ценами
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="border-top py-4 bg-white">
+      <div
+        class="container d-flex flex-wrap justify-content-between align-items-center gap-3"
+      >
+        <span class="text-muted small">© 2025 BarGo</span>
+        <ul class="nav small">
+          <li class="nav-item">
+            <a href="#" class="nav-link px-2 text-muted"
+              >Политика конфиденциальности</a
+            >
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link px-2 text-muted">Условия</a>
+          </li>
+        </ul>
+      </div>
+    </footer>
+
+    <!-- Bootstrap -->
+    <script src="bootstrap-5.3.8-dist/js/bootstrap.bundle.js"></script>
+
+    <!-- Dynamic product loading -->
+    <script src="productInfo.js"></script>
+    <script src="auth.js"></script>
+  </body>
+</html>

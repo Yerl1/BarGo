@@ -23,11 +23,12 @@ type DBconfig struct {
 }
 
 type ServicePorts struct {
-	BusinessServicePort string `yaml:"business_service"`
-	ConsumerServicePort string `yaml:"consumer_service"`
-	AdminServicePort    string `yaml:"admin_service"`
-	AuthServicePort     string `yaml:"auth_service"`
-	WebServicePort      string `yaml:"web_service"`
+	BusinessServicePort    string `yaml:"business_service"`
+	ConsumerServicePort    string `yaml:"consumer_service"`
+	AdminServicePort       string `yaml:"admin_service"`
+	AuthServicePort        string `yaml:"auth_service"`
+	ConsumerWebServicePort string `yaml:"consumer_web_service"`
+	BusinessWebServicePort string `yaml:"business_web_service"`
 }
 
 type App struct {

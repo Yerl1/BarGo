@@ -1,17 +1,17 @@
-package authservice
+package consumerservice
 
 import (
 	"context"
 	"errors"
 	"net/http"
 
-	"backend/internal/auth-service/adapters/driver/myhttp"
 	"backend/internal/configs"
+	"backend/internal/consumer-service/adapters/driver/myhttp"
 	"backend/internal/mylogger"
 )
 
 func Execute(ctx context.Context, mylog mylogger.Logger, cfg *configs.Config) error {
-	log := mylog.With().Str("Execute", "auth-service").Logger()
+	log := mylog.With().Str("Execute", "consumer-service").Logger()
 
 	server := myhttp.NewServer(ctx, mylog, cfg)
 

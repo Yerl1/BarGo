@@ -61,11 +61,11 @@ func (s *Server) Run() error {
 	// Configure routes and handlers
 	s.Configure()
 
-	log.Debug().Str("port", s.cfg.Srv.AuthServicePort)
+	log.Info().Str("port", s.cfg.Srv.ConsumerServicePort).Msg("this port")
 
 	s.mu.Lock()
 	s.srv = &http.Server{
-		Addr:    fmt.Sprintf(":%v", s.cfg.Srv.AuthServicePort),
+		Addr:    fmt.Sprintf(":%v", s.cfg.Srv.ConsumerServicePort),
 		Handler: s.mdl.CorsMiddleware(s.mux),
 	}
 	s.mu.Unlock()
@@ -138,10 +138,11 @@ func (s *Server) Configure() {
 
 	s.mux.Handle("GET /consumer/health", consumerHandler.HealthHandler())
 
-	// OSRM endpoints
-	s.mux.Handle("GET /osrm/car/{start}/{end}", s.mdl.Wrap(consumerHandler.CarRoute()))
-	s.mux.Handle("GET /osrm/bike/{start}/{end}", s.mdl.Wrap(consumerHandler.BikeRoute()))
-	s.mux.Handle("GET /osrm/foot/{start}/{end}", s.mdl.Wrap(consumerHandler.FootRoute()))
+	s.mux.Handle("GET /stores", consumerHandler.GetStores())
+
+	s.mux.Handle("GET /products", consumerHandler.GetAllProducts())
+
+	s.mux.Handle("GET /product-info", consumerHandler.GetProductInfo())
 }
 
 func (s *Server) initializeDatabase() error {

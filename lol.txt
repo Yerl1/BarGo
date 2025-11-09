@@ -9,3 +9,15 @@ sudo docker run -t -i -p 5001:5000 -v "${PWD}/bike:/data" ghcr.io/project-osrm/o
 # Foot (port 5002)
 sudo docker run -t -i -p 5002:5000 -v "${PWD}/foot:/data" ghcr.io/project-osrm/osrm-backend \
   osrm-routed --algorithm mld /data/kazakhstan-251102.osrm
+
+🧠 5. Advanced ideas
+
+Once this works, you can easily:
+
+Dynamically set start to the user’s current location (navigator.geolocation.getCurrentPosition)
+
+Set end to a store’s coordinate from your database
+
+Add store markers from your backend
+
+Cache route results to reduce OSRM calls
