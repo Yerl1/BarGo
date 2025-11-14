@@ -14,5 +14,5 @@ type IConsumerRepo interface {
 	GetStoreInfo(ctx context.Context, storeID string) (dto.StoreInfo, error)
 	AddCommentToStore(ctx context.Context, storeID string, comment *dto.AddCommentRequest) error
 	GetStoreComments(ctx context.Context, storeID string) ([]dto.StoreComment, error)
-	UpdateStoreCommentVotes(ctx context.Context, storeID string, commentID string, amount string) (dto.StoreInfo, error)
+	UpdateStoreCommentVotes(ctx context.Context, storeID string, commentID string, amount string) error
 }

@@ -151,7 +151,7 @@ func (s *Server) Configure() {
 	// Comments
 	s.mux.Handle("POST /stores/{store_id}/comments", consumerHandler.AddCommentToStore())
 	s.mux.Handle("GET /stores/{store_id}/comments", consumerHandler.GetStoreComments())
-	s.mux.Handle("PUT /store/comments/{store_id}/{comment_id}", consumerHandler.UpdateStoreCommentVotes())
+	s.mux.Handle("PUT /stores/{store_id}/{comment_id}", consumerHandler.UpdateStoreCommentVotes())
 }
 
 func (s *Server) initializeDatabase() error {

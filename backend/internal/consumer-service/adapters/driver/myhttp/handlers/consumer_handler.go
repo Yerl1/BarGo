@@ -183,18 +183,17 @@ func (h *ConsumerHandler) UpdateStoreCommentVotes() http.HandlerFunc {
 		amount := r.URL.Query().Get("amount") // e.g., "1" or "-1"
 
 		// Call the service layer to get stores
-		storeInfo, err := h.service.UpdateStoreCommentVotes(h.ctx, storeId, commentId, amount)
+		err := h.service.UpdateStoreCommentVotes(h.ctx, storeId, commentId, amount)
 		if err != nil {
 			JsonResponse(w, "Failed to update store comment votes", http.StatusInternalServerError)
 			return
 		}
 
 		h.mylog.Debug().
-			Str("store_name", storeInfo.Name).
-			Msg("Store info fetched successfully")
+			Msg("Store votes updated successfully")
 
 		// Serialize and write the response
-		JsonResponse(w, storeInfo, http.StatusOK)
+		JsonResponse(w, "Store votes updated successfully", http.StatusOK)
 	}
 }
 

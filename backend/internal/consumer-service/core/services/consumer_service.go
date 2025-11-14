@@ -145,6 +145,6 @@ func (s *ConsumerService) GetStoreComments(ctx context.Context, storeID string) 
 	return s.ConsumerRepo.GetStoreComments(ctx, storeID)
 }
 
-func (s *ConsumerService) UpdateStoreCommentVotes(ctx context.Context, storeID string, commentID string, amount string) (dto.StoreInfo, error) {
+func (s *ConsumerService) UpdateStoreCommentVotes(ctx context.Context, storeID string, commentID string, amount string) error {
 	return s.ConsumerRepo.UpdateStoreCommentVotes(ctx, storeID, commentID, amount)
 }

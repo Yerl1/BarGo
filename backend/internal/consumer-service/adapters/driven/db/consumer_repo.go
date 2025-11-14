@@ -526,7 +526,9 @@ func (r *ConsumerRepo) GetStoreComments(ctx context.Context, storeID string) ([]
 	return comments, nil
 }
 
-func (r *ConsumerRepo) UpdateStoreCommentVotes(ctx context.Context, storeID string, commentID string, amount string) (dto.StoreInfo, error) {
+func (r *ConsumerRepo) UpdateStoreCommentVotes(ctx context.Context, storeID string, commentID string, amount string) error {
+	log := r.mylog.Logger.With().Str("method", "UpdateStoreCommentVotes").Logger()
+
 	// Update helpful votes
 	queryUpdate := `
 		UPDATE comments
@@ -536,19 +538,15 @@ func (r *ConsumerRepo) UpdateStoreCommentVotes(ctx context.Context, storeID stri
 
 	amt, err := strconv.Atoi(amount)
 	if err != nil {
-		return dto.StoreInfo{}, fmt.Errorf("invalid amount: %w", err)
+		log.Error().Err(err).Msg("invalid amount")
+		return fmt.Errorf("invalid amount: %w", err)
 	}
 
 	_, err = r.DB.conn.Exec(ctx, queryUpdate, amt, storeID, commentID)
 	if err != nil {
-		return dto.StoreInfo{}, fmt.Errorf("failed to update comment votes: %w", err)
+		log.Error().Err(err).Msg("failed to update comment votes")
+		return fmt.Errorf("failed to update comment votes: %w", err)
 	}
 
-	// Return updated store info
-	storeInfo, err := r.GetStoreInfo(ctx, storeID)
-	if err != nil {
-		return dto.StoreInfo{}, fmt.Errorf("failed to get updated store info: %w", err)
-	}
-
-	return storeInfo, nil
+	return nil
 }
