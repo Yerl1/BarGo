@@ -202,6 +202,27 @@ services:
       - ./map_data:/data
     restart: unless-stopped
 
+  # ------------------------------
+  # ML FastAPI Service
+  # ------------------------------
+  ml-fastapi-service:
+    build:
+      context: ./ml-fastapi
+      dockerfile: ml-fastapi-service.Dockerfile
+    container_name: bargo-ml-api
+    ports:
+      - "3005:3005"
+    volumes:
+      - ./ml-fastapi:/app
+      - ./tfidf_vectorizer.joblib:/app/tfidf_vectorizer.joblib:ro
+      - ./toxic_comment_model.h5:/app/toxic_comment_model.h5:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3006/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 # ------------------------------
 # Networks & Volumes
 # ------------------------------

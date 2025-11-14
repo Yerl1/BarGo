@@ -2,11 +2,13 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	"backend/internal/consumer-service/core/domain/dto"
 	"backend/internal/mylogger"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/rs/zerolog/log"
 )
 
@@ -160,7 +162,7 @@ func (r *ConsumerRepo) GetAllProducts(ctx context.Context) ([]dto.Product, error
 	return products, nil
 }
 
-func (r *ConsumerRepo) GetProductInfo(ctx context.Context, productID string) (dto.ProductInfo, error) {
+func (r *ConsumerRepo) GetProductInfo(ctx context.Context, productID string) (dto.ProductStoresInfo, error) {
 	log := log.With().Str("method", "GetProductInfo").Logger()
 	log.Debug().
 		Str("product_id", productID).
@@ -191,7 +193,7 @@ func (r *ConsumerRepo) GetProductInfo(ctx context.Context, productID string) (dt
 			Str("query", "GetProductInfo - product").
 			Str("product_id", productID).
 			Msg("failed to query product info")
-		return dto.ProductInfo{}, err
+		return dto.ProductStoresInfo{}, err
 	}
 
 	var stores []dto.Store
@@ -215,7 +217,7 @@ func (r *ConsumerRepo) GetProductInfo(ctx context.Context, productID string) (dt
 			Str("query", "GetProductInfo - stores").
 			Str("product_id", productID).
 			Msg("failed to query stores for product")
-		return dto.ProductInfo{}, err
+		return dto.ProductStoresInfo{}, err
 	}
 	defer rows.Close()
 
@@ -229,7 +231,7 @@ func (r *ConsumerRepo) GetProductInfo(ctx context.Context, productID string) (dt
 			&s.Longitude,
 		); err != nil {
 			log.Error().Err(err).Msg("failed to scan store row for product")
-			return dto.ProductInfo{}, err
+			return dto.ProductStoresInfo{}, err
 		}
 		stores = append(stores, s)
 	}
@@ -239,7 +241,7 @@ func (r *ConsumerRepo) GetProductInfo(ctx context.Context, productID string) (dt
 			Err(err).
 			Str("query", "GetProductInfo - stores").
 			Msg("row iteration error")
-		return dto.ProductInfo{}, err
+		return dto.ProductStoresInfo{}, err
 	}
 
 	log.Debug().
@@ -247,8 +249,306 @@ func (r *ConsumerRepo) GetProductInfo(ctx context.Context, productID string) (dt
 		Int("store_count", len(stores)).
 		Msg("successfully fetched product info")
 
-	return dto.ProductInfo{
+	return dto.ProductStoresInfo{
 		Product: product,
 		Stores:  stores,
 	}, nil
+}
+
+func (r *ConsumerRepo) GetStoreInfo(ctx context.Context, storeID string) (dto.StoreInfo, error) {
+	query := `
+		SELECT 
+			s.store_id,
+			s.name,
+			s.address,
+			s.photo,
+			s.description,
+			s.owner_id,
+			c.latitude,
+			c.longitude,
+			COALESCE(AVG(cm.rating), 0) as average_rating,
+			COUNT(cm.comment_id) as review_count
+		FROM stores s
+		LEFT JOIN coords c ON s.coord = c.coord_id
+		LEFT JOIN comments cm ON s.store_id = cm.store_id
+		WHERE s.store_id = $1
+		GROUP BY 
+			s.store_id, s.name, s.address, s.photo, s.description, s.owner_id,
+			c.latitude, c.longitude
+	`
+
+	var store dto.StoreInfo
+	err := r.DB.conn.QueryRow(ctx, query, storeID).Scan(
+		&store.StoreID,
+		&store.Name,
+		&store.Address,
+		&store.Photo,
+		&store.Description,
+		&store.OwnerID,
+		&store.Latitude,
+		&store.Longitude,
+		&store.AverageRating,
+		&store.ReviewCount,
+	)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return dto.StoreInfo{}, fmt.Errorf("store not found: %s", storeID)
+		}
+		return dto.StoreInfo{}, fmt.Errorf("failed to get store info: %w", err)
+	}
+
+	return store, nil
+}
+
+func (r *ConsumerRepo) GetStoreProducts(
+	ctx context.Context,
+	storeID string,
+	page string,
+	limit string,
+	search string,
+	sort string,
+) ([]dto.ProductInfo, error) {
+	log := r.mylog.Logger.With().
+		Str("method", "GetStoreProducts").
+		Str("store_id", storeID).
+		Str("page", page).
+		Str("limit", limit).
+		Str("search", search).
+		Str("sort", sort).
+		Logger()
+
+	log.Info().Msg("Fetching store products")
+
+	// ---------------------
+	// Parse pagination
+	// ---------------------
+	pageInt, err := strconv.Atoi(page)
+	if err != nil || pageInt < 1 {
+		log.Warn().Err(err).Msg("Invalid page param, defaulting to 1")
+		pageInt = 1
+	}
+
+	limitInt, err := strconv.Atoi(limit)
+	if err != nil || limitInt < 1 || limitInt > 100 {
+		log.Warn().Err(err).Msg("Invalid limit param, defaulting to 12")
+		limitInt = 12
+	}
+
+	offset := (pageInt - 1) * limitInt
+
+	// ---------------------
+	// Base query
+	// ---------------------
+	baseQuery := `
+		SELECT 
+			product_id,
+			store_id,
+			name,
+			description,
+			photo,
+			price,
+			created_at,
+			updated_at,
+			(price > 0) as in_stock
+		FROM products
+		WHERE store_id = $1
+	`
+
+	args := []interface{}{storeID}
+	argPos := 2 // Next placeholder index
+
+	// ---------------------
+	// Search filter
+	// ---------------------
+	if search != "" {
+		log.Debug().Msg("Applying search filter to query")
+
+		baseQuery += fmt.Sprintf(`
+			AND (
+				name ILIKE $%d
+				OR description ILIKE $%d
+			)
+		`, argPos, argPos)
+
+		args = append(args, "%"+search+"%")
+		argPos++
+	}
+
+	// ---------------------
+	// Sorting
+	// ---------------------
+	orderBy := "created_at DESC" // Default sorting
+
+	switch sort {
+	case "price_asc":
+		orderBy = "price ASC"
+
+	case "price_desc":
+		orderBy = "price DESC"
+
+	case "relevance":
+		if search != "" {
+			log.Debug().Msg("Applying relevance sorting")
+
+			// Fix: relevance must use the correct arg index
+			orderBy = fmt.Sprintf(`
+				CASE 
+					WHEN name ILIKE $%d THEN 1
+					WHEN description ILIKE $%d THEN 2
+					ELSE 3
+				END, created_at DESC
+			`, argPos-1, argPos-1)
+		}
+	}
+
+	// ---------------------
+	// Final query assembly
+	// ---------------------
+	query := fmt.Sprintf(`
+		%s
+		ORDER BY %s
+		LIMIT $%d OFFSET $%d
+	`, baseQuery, orderBy, argPos, argPos+1)
+
+	args = append(args, limitInt, offset)
+
+	log.Debug().
+		Str("query", query).
+		Int("args_count", len(args)).
+		Interface("args", args).
+		Msg("Executing SQL query")
+
+	// ---------------------
+	// Execute query
+	// ---------------------
+	rows, err := r.DB.conn.Query(ctx, query, args...)
+	if err != nil {
+		log.Error().Err(err).Msg("Query execution failed")
+		return nil, fmt.Errorf("failed to query store products: %w", err)
+	}
+	defer rows.Close()
+
+	// ---------------------
+	// Process rows
+	// ---------------------
+	var products []dto.ProductInfo
+
+	for rows.Next() {
+		var product dto.ProductInfo
+
+		if err := rows.Scan(
+			&product.ProductID,
+			&product.StoreID,
+			&product.Name,
+			&product.Description,
+			&product.Photo,
+			&product.Price,
+			&product.CreatedAt,
+			&product.UpdatedAt,
+			&product.InStock,
+		); err != nil {
+			log.Error().Err(err).Msg("Failed to scan row")
+			return nil, fmt.Errorf("failed to scan product: %w", err)
+		}
+
+		products = append(products, product)
+	}
+
+	// Check for iteration errors
+	if err = rows.Err(); err != nil {
+		log.Error().Err(err).Msg("Row iteration error")
+		return nil, fmt.Errorf("error iterating products: %w", err)
+	}
+
+	log.Info().
+		Int("count", len(products)).
+		Msg("Products fetched successfully")
+
+	return products, nil
+}
+
+func (r *ConsumerRepo) AddCommentToStore(ctx context.Context, storeID string, comment *dto.AddCommentRequest) error {
+	query := `
+		INSERT INTO comments (store_id, user_id, content, rating, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, NOW(), NOW());
+	`
+
+	_, err := r.DB.conn.Exec(ctx, query,
+		storeID,
+		comment.UserID,
+		comment.Content,
+		comment.Rating,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to add comment to store: %w", err)
+	}
+
+	return nil
+}
+
+func (r *ConsumerRepo) GetStoreComments(ctx context.Context, storeID string) ([]dto.StoreComment, error) {
+	query := `
+		SELECT
+			comment_id,
+			user_id,
+			content,
+			rating,
+			helpful_votes
+		FROM comments
+		WHERE store_id = $1;
+	`
+
+	rows, err := r.DB.conn.Query(ctx, query, storeID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query store comments: %w", err)
+	}
+	defer rows.Close()
+
+	var comments []dto.StoreComment
+	for rows.Next() {
+		var comment dto.StoreComment
+		if err := rows.Scan(
+			&comment.CommentID,
+			&comment.UserID,
+			&comment.Content,
+			&comment.Rating,
+			&comment.HelpfulVotes,
+		); err != nil {
+			return nil, fmt.Errorf("failed to scan store comment: %w", err)
+		}
+		comments = append(comments, comment)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating store comments: %w", err)
+	}
+
+	return comments, nil
+}
+
+func (r *ConsumerRepo) UpdateStoreCommentVotes(ctx context.Context, storeID string, commentID string, amount string) (dto.StoreInfo, error) {
+	// Update helpful votes
+	queryUpdate := `
+		UPDATE comments
+		SET helpful_votes = helpful_votes + $1
+		WHERE store_id = $2 AND comment_id = $3;
+	`
+
+	amt, err := strconv.Atoi(amount)
+	if err != nil {
+		return dto.StoreInfo{}, fmt.Errorf("invalid amount: %w", err)
+	}
+
+	_, err = r.DB.conn.Exec(ctx, queryUpdate, amt, storeID, commentID)
+	if err != nil {
+		return dto.StoreInfo{}, fmt.Errorf("failed to update comment votes: %w", err)
+	}
+
+	// Return updated store info
+	storeInfo, err := r.GetStoreInfo(ctx, storeID)
+	if err != nil {
+		return dto.StoreInfo{}, fmt.Errorf("failed to get updated store info: %w", err)
+	}
+
+	return storeInfo, nil
 }

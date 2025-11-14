@@ -1,4 +1,4 @@
-// productInfo.js
+// productStoresInfo.js
 
 document.addEventListener("DOMContentLoaded", async () => {
   // 1️⃣ Get product_id from URL

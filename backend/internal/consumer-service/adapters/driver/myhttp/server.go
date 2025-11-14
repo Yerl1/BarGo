@@ -136,13 +136,22 @@ func (s *Server) Configure() {
 
 	consumerHandler := handlers.NewConsumerHandler(s.ctx, consumerService, s.mylog)
 
+	// Health check
 	s.mux.Handle("GET /consumer/health", consumerHandler.HealthHandler())
 
+	// Stores
 	s.mux.Handle("GET /stores", consumerHandler.GetStores())
+	s.mux.Handle("GET /stores/{store_id}", consumerHandler.GetStoreInfo())
+	s.mux.Handle("GET /stores/{store_id}/products", consumerHandler.GetStoreProducts())
 
+	// Products
 	s.mux.Handle("GET /products", consumerHandler.GetAllProducts())
-
 	s.mux.Handle("GET /product-info", consumerHandler.GetProductInfo())
+
+	// Comments
+	s.mux.Handle("POST /stores/{store_id}/comments", consumerHandler.AddCommentToStore())
+	s.mux.Handle("GET /stores/{store_id}/comments", consumerHandler.GetStoreComments())
+	s.mux.Handle("PUT /store/comments/{store_id}/{comment_id}", consumerHandler.UpdateStoreCommentVotes())
 }
 
 func (s *Server) initializeDatabase() error {
