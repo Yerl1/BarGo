@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Маркет 24 — BarGo</title>
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="bootstrap-5.3.8-dist/css/bootstrap.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <!-- Google Fonts (как на главной) -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;500;700&display=swap"
+    rel="stylesheet">
+  <!-- Общая тема сайта -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Небольшие локальные стили для этой страницы -->
+  <style>
+    .store-hero { background: var(--soft-bg, #f5f8ff); }
+    .info-card { border-radius: 1rem; box-shadow: 0 10px 24px -16px rgba(0,0,0,.15); }
+    .map-shell { min-height: 420px; }
+    .review-card { border-radius: 1rem; }
+    .review-photo { width: 72px; height: 72px; object-fit: cover; border-radius: .5rem; }
+    .star { color: #f59e0b; }
+    .controls-lite { backdrop-filter: saturate(120%) blur(2px); }
+    @media (min-width: 992px){
+      .equal-cols { display: grid; grid-template-columns: 1fr 340px; gap: 1.25rem; }
+    }
+    /* для скрытия элементов пагинацией, не конфликтует с фильтрами */
+    .d-none-page{ display:none !important; }
+  </style>
+</head>
+<body>
+<!-- Header -->
+<header class="header">
+  <div class="container h-100">
+    <div class="d-flex align-items-center justify-content-between h-100">
+      <!-- Левая часть: логотип -->
+      <div class="d-flex align-items-center gap-4">
+        <a href="index.html" class="logo d-flex align-items-center gap-2">
+          <i class="bi bi-cart"></i>
+          <span>BarGo</span>
+        </a>
+        <span class="d-none d-md-inline text-muted small">
+          Магазин · Маркет 24
+        </span>
+      </div>
+
+      <!-- Правая часть: поиск + иконки + юзер -->
+      <div class="d-flex align-items-center gap-3">
+        <!-- Поиск в хедере (отдельный от фильтра товаров магазина) -->
+        <div class="position-relative d-none d-md-block">
+          <input type="text" class="search-input" placeholder="Поиск по BarGo" id="headerSearch">
+          <i class="bi bi-search position-absolute"
+             style="right: 16px; top: 50%; transform: translateY(-50%); color: var(--muted);"></i>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button class="icon-btn">
+            <i class="bi bi-chat"></i>
+          </button>
+          <button class="icon-btn">
+            <i class="bi bi-bell"></i>
+          </button>
+          <button class="icon-btn">
+            <i class="bi bi-cart"></i>
+          </button>
+
+          <div class="dropdown">
+            <button class="icon-btn dropdown-toggle d-flex align-items-center gap-2" id="userButton"
+                    data-bs-toggle="dropdown">
+              <img
+                src="https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-vector-illustration_561158-3485.jpg?w=80"
+                alt="User Photo" class="rounded-circle" width="32" height="32" id="userAvatar">
+              <span id="userName" class="fw-semibold">Гость</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" id="userMenu">
+              <li>
+                <a class="dropdown-item" href="#">
+                  <i class="bi bi-pencil-square me-2"></i>Редактировать профиль
+                </a>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <a class="dropdown-item text-danger" href="#" id="logoutBtn">
+                  <i class="bi bi-box-arrow-right me-2"></i>Выйти
+                </a>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+<!-- Шапка магазина -->
+<section class="py-4 store-hero border-bottom">
+  <div class="container">
+    <nav class="small mb-2" aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="index.html">Главная</a></li>
+        <li class="breadcrumb-item"><a href="product.html">Щелочные батарейки AA (4 шт.)</a></li>
+        <li class="breadcrumb-item active">Маркет 24</li>
+      </ol>
+    </nav>
+
+    <h1 class="h4 mb-1">Маркет 24</h1>
+    <div class="text-muted mb-3">
+      <i class="bi bi-geo-alt"></i> г. Астана, ул. Сарыарка, <b>10</b> • <b>0.7</b> км
+      <span class="ms-3 badge bg-chip">Открыто сейчас</span>
+    </div>
+
+    <!-- Карта + карточка информации -->
+    <div class="equal-cols">
+      <div class="card shadow-sm product-card">
+        <div class="card-body p-0">
+          <div class="map-wrapper map-shell rounded-3">
+            <div class="map-placeholder d-flex align-items-center justify-content-center h-100">
+              <div class="text-center text-muted">
+                <i class="bi bi-map fs-1 d-block mb-2"></i>
+                Здесь будет карта магазина
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="card info-card bg-white">
+        <div class="card-body">
+          <h6 class="mb-3">Информация</h6>
+          <div class="small text-muted mb-2"><i class="bi bi-clock me-1"></i> Пн–Вс: 09:00–22:00</div>
+          <div class="small text-muted mb-2"><i class="bi bi-cash-coin me-1"></i> Оплата: наличные, карта</div>
+          <div class="small text-muted"><i class="bi bi-star-fill star me-1"></i> Рейтинг: <b id="infoRatingValue">4.6/5</b> (<span id="infoRatingCount">124</span>)</div>
+          <hr>
+          <div class="d-grid gap-2">
+            <a href="#" class="btn btn-primary"><i class="bi bi-signpost me-1"></i> Маршрут</a>
+            <a href="#" class="btn btn-outline-primary"><i class="bi bi-telephone me-1"></i> Позвонить</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- Панель управления товарами магазина -->
+<section class="py-3 controls-sticky bg-white border-bottom controls-lite">
+  <div class="container d-flex flex-wrap align-items-center gap-3">
+    <div class="text-muted small">Товаров: <strong id="foundCount">—</strong></div>
+
+    <div class="input-group input-group-sm" style="max-width:360px">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input id="q" type="text" class="form-control" placeholder="Найти товар в этом магазине">
+    </div>
+
+    <select id="sortSelect" class="form-select form-select-sm" style="max-width:230px">
+      <option value="relevance" selected>По релевантности</option>
+      <option value="price_asc">Цена: сначала дешевле</option>
+      <option value="price_desc">Цена: сначала дороже</option>
+    </select>
+  </div>
+</section>
+
+<!-- Товары магазина -->
+<section class="py-4">
+  <div class="container">
+    <div id="storeGrid" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+
+      <!-- 1. Батарейки -->
+      <div class="col store-prod"
+           data-title="Щелочные батарейки AA (4 шт.)"
+           data-keywords="батарейка aa алкалиновые energizer duracell"
+           data-price="1290">
+        <div class="card h-100 product-card">
+          <div class="ratio ratio-16x9">
+            <img src="https://via.placeholder.com/640x360"
+                 class="card-img-top img-cover" alt="Щелочные батарейки AA (4 шт.)">
+          </div>
+          <div class="card-body d-flex flex-column">
+            <h6 class="card-title js-title mb-1">Щелочные батарейки AA (4 шт.)</h6>
+            <div class="text-muted small mb-2">В наличии • Арт. DEMO-001</div>
+            <div class="mt-auto d-flex align-items-center justify-content-between">
+              <div class="fw-semibold text-primary-emphasis">1 290 ₸</div>
+              <a href="product.html" class="btn btn-outline-primary btn-sm">К описанию</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+      <!-- 2. Кофе -->
+      <div class="col store-prod"
+           data-title="Кофе молотый BarGo 250 г"
+           data-keywords="кофе молотый арабика robusta ground"
+           data-price="2490">
+        <div class="card h-100 product-card">
+          <div class="ratio ratio-16x9">
+            <img src="https://via.placeholder.com/640x360"
+                 class="card-img-top img-cover" alt="Кофе молотый BarGo 250 г">
+          </div>
+          <div class="card-body d-flex flex-column">
+            <h6 class="card-title js-title mb-1">Кофе молотый BarGo 250 г</h6>
+            <div class="text-muted small mb-2">В наличии • Арт. DEMO-101</div>
+            <div class="mt-auto d-flex align-items-center justify-content-between">
+              <div class="fw-semibold text-primary-emphasis">2 490 ₸</div>
+              <a href="product.html" class="btn btn-outline-primary btn-sm">К описанию</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+      <!-- 3. Шампунь -->
+      <div class="col store-prod"
+           data-title="Шампунь 400 мл"
+           data-keywords="шампунь уход за волосами"
+           data-price="1790">
+        <div class="card h-100 product-card">
+          <div class="ratio ratio-16x9">
+            <img src="https://via.placeholder.com/640x360"
+                 class="card-img-top img-cover" alt="Шампунь 400 мл">
+          </div>
+          <div class="card-body d-flex flex-column">
+            <h6 class="card-title js-title mb-1">Шампунь 400 мл</h6>
+            <div class="text-muted small mb-2">В наличии • Арт. DEMO-203</div>
+            <div class="mt-auto d-flex align-items-center justify-content-between">
+              <div class="fw-semibold text-primary-emphasis">1 790 ₸</div>
+              <a href="product.html" class="btn btn-outline-primary btn-sm">К описанию</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+      <!-- при желании добавишь ещё по образцу -->
+    
+    </div>
+    
+
+    <!-- Пусто -->
+    <div id="emptyState" class="text-center text-muted py-5 d-none">
+      <i class="bi bi-search fs-1 d-block mb-2"></i>
+      Ничего не найдено по запросу «<span id="emptyQuery">...</span>».
+    </div>
+
+    <!-- Пагинация -->
+    <nav class="mt-4">
+      <ul class="pagination justify-content-center" id="pagination"></ul>
+    </nav>
+  </div>
+</section>
+
+<!-- ОТЗЫВЫ + форма -->
+<section class="py-5 border-top">
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+      <h2 class="h5 mb-0">Отзывы</h2>
+      <span class="text-muted small">Найдено: <strong id="revCount">—</strong></span>
+
+      <div class="input-group input-group-sm ms-auto" style="max-width:320px">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input id="revQuery" type="text" class="form-control" placeholder="Поиск по отзывам">
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <label class="small text-muted mb-0">Мин. оценка:</label>
+        <select id="revMin" class="form-select form-select-sm" style="width:110px">
+          <option value="0">Все</option>
+          <option value="1">1★+</option>
+          <option value="2">2★+</option>
+          <option value="3">3★+</option>
+          <option value="4" selected>4★+</option>
+          <option value="5">5★</option>
+        </select>
+      </div>
+
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="revPhotos">
+        <label class="form-check-label small" for="revPhotos">Только с фото</label>
+      </div>
+
+      <select id="revSort" class="form-select form-select-sm" style="width:200px">
+        <option value="new">Сначала новые</option>
+        <option value="rating_desc" selected>По оценке (высокие)</option>
+        <option value="rating_asc">По оценке (низкие)</option>
+      </select>
+    </div>
+
+    <!-- Форма добавления отзыва -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <form id="reviewForm" class="row g-3">
+          <div class="col-12 col-md-4">
+            <label class="form-label small">Ваше имя</label>
+            <input type="text" class="form-control" id="rfName" placeholder="Например, Айдана" required>
+          </div>
+          <div class="col-6 col-md-2">
+            <label class="form-label small">Оценка</label>
+            <select id="rfRating" class="form-select" required>
+              <option value="" selected disabled>—</option>
+              <option value="5">5 ★</option>
+              <option value="4">4 ★</option>
+              <option value="3">3 ★</option>
+              <option value="2">2 ★</option>
+              <option value="1">1 ★</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label small">Отзыв</label>
+            <textarea id="rfText" class="form-control" rows="3" placeholder="Коротко опишите впечатление" required></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label small">Фото (до 3)</label>
+            <input id="rfPhotos" type="file" accept="image/*" class="form-control" multiple>
+            <div id="rfPreview" class="d-flex gap-2 mt-2 flex-wrap"></div>
+            <div class="form-text">Изображения сохраняются временно в вашем браузере.</div>
+          </div>
+          <div class="col-12 d-flex gap-2">
+            <button class="btn btn-primary" type="submit"><i class="bi bi-send"></i> Отправить</button>
+            <button class="btn btn-outline-secondary" type="reset" id="rfReset">Очистить</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Список отзывов (демо + добавленные) -->
+    <div id="reviews" class="vstack gap-3">
+      <article class="card review-card p-3 rev" data-rating="5" data-date="2025-10-20" data-hasphoto="1">
+        <div class="d-flex gap-3">
+          <img src="https://via.placeholder.com/72" class="review-photo d-none d-sm-block" alt="">
+          <div class="w-100">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="fw-semibold">Анель</div>
+              <div class="text-muted small">20.10.2025</div>
+            </div>
+            <div class="mb-1">
+              <i class="bi bi-star-fill star"></i><i class="bi bi-star-fill star"></i><i class="bi bi-star-fill star"></i><i class="bi bi-star-fill star"></i><i class="bi bi-star-fill star"></i>
+            </div>
+            <p class="mb-2 js-text">Быстро обслужили, цена ниже, чем у соседей. Парковка рядом.</p>
+            <div class="d-flex gap-2 flex-wrap">
+              <img src="https://via.placeholder.com/120x90" class="rounded" alt="">
+              <img src="https://via.placeholder.com/120x90" class="rounded" alt="">
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card review-card p-3 rev" data-rating="4" data-date="2025-10-12" data-hasphoto="0">
+        <div class="d-flex gap-3">
+          <div class="d-none d-sm-block review-photo bg-light"></div>
+          <div class="w-100">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="fw-semibold">Данияр</div>
+              <div class="text-muted small">12.10.2025</div>
+            </div>
+            <div class="mb-1">
+              <i class="bi bi-star-fill star"></i><i class="bi bi-star-fill star"></i><i class="bi bi-star-fill star"></i><i class="bi bi-star-fill star"></i>
+            </div>
+            <p class="mb-0 js-text">Нормальный выбор, но хотелось бы больше касс в час пик.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="card review-card p-3 rev" data-rating="3" data-date="2025-09-28" data-hasphoto="1">
+        <div class="d-flex gap-3">
+          <img src="https://via.placeholder.com/72" class="review-photo d-none d-sm-block" alt="">
+          <div class="w-100">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="fw-semibold">Айжан</div>
+              <div class="text-muted small">28.09.2025</div>
+            </div>
+            <div class="mb-1">
+              <i class="bi bi-star-fill star"></i><i class="bi bi-star-fill star"></i><i class="bi bi-star-fill star"></i>
+            </div>
+            <p class="mb-2 js-text">Средне: цены ок, но очереди. Удобно, что близко от дома.</p>
+            <img src="https://via.placeholder.com/120x90" class="rounded" alt="">
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div id="revEmpty" class="text-center text-muted py-4 d-none">
+      Ничего не найдено под текущие фильтры.
+    </div>
+  </div>
+</section>
+
+<footer class="border-top py-4 bg-white">
+  <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <span class="text-muted small">© 2025 BarGo</span>
+    <ul class="nav small">
+      <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">Политика конфиденциальности</a></li>
+      <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">Условия</a></li>
+    </ul>
+  </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="bootstrap-5.3.8-dist/js/bootstrap.bundle.js"></script>
+<script src="storeScript.js"></script>
+<!-- ТОВАРЫ МАГАЗИНА: поиск + сортировка + пагинация -->
+<script>
+  const STORE_REV_KEY = 'reviews:store:market24';
+
+  const $revQ = document.getElementById('revQuery');
+  const $revMin = document.getElementById('revMin');
+  const $revPhotos = document.getElementById('revPhotos');
+  const $revSort = document.getElementById('revSort');
+  const $revCount = document.getElementById('revCount');
+  const $revEmpty = document.getElementById('revEmpty');
+  const $reviewsWrap = document.getElementById('reviews');
+
+  const $rf = document.getElementById('reviewForm');
+  const $rfName = document.getElementById('rfName');
+  const $rfRating = document.getElementById('rfRating');
+  const $rfText = document.getElementById('rfText');
+  const $rfPhotosInput = document.getElementById('rfPhotos');
+  const $rfPreview = document.getElementById('rfPreview');
+  const $rfReset = document.getElementById('rfReset');
+
+  const $infoAvg = document.getElementById('infoRatingValue');
+  const $infoCnt = document.getElementById('infoRatingCount');
+
+  const norm = s => (s||'').toString().trim().toLowerCase();
+
+  function loadUserReviews(){ try { return JSON.parse(localStorage.getItem(STORE_REV_KEY)) || []; } catch { return []; } }
+  function saveUserReviews(list){ localStorage.setItem(STORE_REV_KEY, JSON.stringify(list)); }
+
+  // ---- превью выбранных фото
+  $rfPhotosInput.addEventListener('change', () => {
+    $rfPreview.innerHTML = '';
+    const files = Array.from($rfPhotosInput.files || []).slice(0,3);
+    files.forEach(f=>{
+      const r = new FileReader();
+      r.onload = e => {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.className = 'rounded';
+        img.style.width='96px'; img.style.height='72px'; img.style.objectFit='cover';
+        $rfPreview.appendChild(img);
+      };
+      r.readAsDataURL(f);
+    });
+  });
+  $rfReset.addEventListener('click', ()=>{ $rfPreview.innerHTML=''; });
+
+  // ---- DOM → карточка отзыва
+  function reviewToNode(r){
+    const el = document.createElement('article');
+    el.className = 'card review-card p-3 rev';
+    el.dataset.rating = r.rating;
+    el.dataset.date = r.date;
+    el.dataset.hasphoto = r.photos?.length ? '1' : '0';
+
+    const stars = Array.from({length:r.rating}).map(()=>'<i class="bi bi-star-fill star"></i>').join('');
+    const photos = (r.photos||[]).map(src=>`<img src="${src}" class="rounded" style="width:120px;height:90px;object-fit:cover" alt="">`).join('');
+
+    el.innerHTML = `
+      <div class="d-flex gap-3">
+        ${r.avatar ? `<img src="${r.avatar}" class="review-photo d-none d-sm-block" alt="">`
+                    : `<div class="d-none d-sm-block review-photo bg-light"></div>`}
+        <div class="w-100">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="fw-semibold">${r.name}</div>
+            <div class="text-muted small">${new Date(r.date).toLocaleDateString('ru-RU')}</div>
+          </div>
+          <div class="mb-1">${stars}</div>
+          <p class="mb-2 js-text"></p>
+          ${photos ? `<div class="d-flex gap-2 flex-wrap">${photos}</div>` : ``}
+        </div>
+      </div>`;
+    el.querySelector('.js-text').textContent = r.text;
+    return el;
+  }
+
+  // ---- рейтинг в карточке "Информация"
+  function recalcInfoRating(){
+    const ratings = Array.from(document.querySelectorAll('#reviews .rev'))
+      .map(el => Number(el.dataset.rating))
+      .filter(n => !Number.isNaN(n));
+    const count = ratings.length;
+    const avg = count ? (ratings.reduce((a,b)=>a+b,0) / count) : 0;
+    $infoAvg.textContent = (count ? avg.toFixed(1) : '—') + '/5';
+    $infoCnt.textContent = String(count);
+  }
+
+  // ---- фильтрация/сортировка отзывов
+  function applyReviews(){
+    const q = norm($revQ.value);
+    const min = +$revMin.value;
+    const mustPhoto = $revPhotos.checked;
+
+    const revs = Array.from(document.querySelectorAll('#reviews .rev'));
+    let list = [];
+    revs.forEach(el=>{
+      const text = norm(el.querySelector('.js-text')?.textContent || '');
+      const rating = +el.dataset.rating;
+      const hasPhoto = el.dataset.hasphoto === '1';
+      const ok = (rating >= min) && (!mustPhoto || hasPhoto) && (!q || text.includes(q));
+      el.classList.toggle('d-none', !ok);
+      if(ok) list.push(el);
+    });
+
+    const cmp = {
+      new:          (a,b)=> new Date(b.dataset.date) - new Date(a.dataset.date),
+      rating_desc:  (a,b)=> b.dataset.rating - a.dataset.rating,
+      rating_asc:   (a,b)=> a.dataset.rating - b.dataset.rating
+    }[$revSort.value];
+
+    list.sort(cmp);
+    const frag=document.createDocumentFragment();
+    list.forEach(el=>frag.appendChild(el));
+    revs.filter(el=>el.classList.contains('d-none')).forEach(el=>frag.appendChild(el));
+    $reviewsWrap.appendChild(frag);
+
+    $revCount.textContent = list.length;
+    $revEmpty.classList.toggle('d-none', list.length>0);
+
+    recalcInfoRating();
+  }
+
+  // ---- загрузка/рендер пользовательских отзывов при старте
+  function renderUserReviews(){
+    const user = loadUserReviews();
+    if(!user.length) return;
+    user.forEach(r => $reviewsWrap.insertBefore(reviewToNode(r), $reviewsWrap.firstChild));
+  }
+
+  // ---- отправка формы
+  $rf.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const name = $rfName.value.trim();
+    const rating = +$rfRating.value;
+    const text = $rfText.value.trim();
+    if(!name || !rating || text.length < 3){
+      alert('Пожалуйста, заполните имя, оценку и текст отзыва.');
+      return;
+    }
+
+    // читаем до 3 фото, большие (>1 МБ) пропускаем с сообщением
+    const filesAll = Array.from($rfPhotosInput.files || []);
+    const tooBig = filesAll.filter(f => f.size > 1024*1024);
+    if (tooBig.length) alert('Некоторые фото больше 1 МБ и не будут добавлены.');
+    const files = filesAll.filter(f => f.size <= 1024*1024).slice(0,3);
+
+    const photos = await Promise.all(files.map(f => new Promise(res => {
+      const r = new FileReader();
+      r.onload = e => res(e.target.result);
+      r.readAsDataURL(f);
+    })));
+
+    const now = new Date().toISOString();
+    const review = { id:'u_'+now, name, rating, text, photos, avatar:null, date:now };
+
+    // сохраняем и рисуем
+    const saved = loadUserReviews();
+    saved.unshift(review);
+    saveUserReviews(saved);
+
+    const node = reviewToNode(review);
+    $reviewsWrap.insertBefore(node, $reviewsWrap.firstChild);
+
+    // сброс формы
+    $rf.reset();
+    $rfPreview.innerHTML = '';
+
+    applyReviews();            // пересортировать/пересчитать
+  });
+
+  // init
+  renderUserReviews();
+  [$revQ,$revMin,$revPhotos,$revSort].forEach(el=>el.addEventListener('input', applyReviews));
+  applyReviews();              // подтянет счётчик и рейтинг
+</script>
+</body>
+</html>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BarGo — Информация о товаре</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="bootstrap-5.3.8-dist/css/bootstrap.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="productStyle.css" />
+    <style>
+        :root {
+            --bg: #ffffff;
+            --card-bg: #f8fafc;
+            --text: #1e293b;
+            --muted: #64748b;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --border: #e2e8f0;
+            --success: #10b981;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .navbar-minimal {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .logo-accent {
+            color: var(--accent);
+        }
+
+        .back-btn {
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .back-btn:hover {
+            color: var(--text);
+        }
+
+        .product-hero {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 3rem 0;
+            margin-bottom: 3rem;
+        }
+
+        .product-image {
+            width: 100%;
+            max-width: 500px;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .product-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: 1.5rem;
+        }
+
+        .product-meta {
+            color: var(--muted);
+            margin-bottom: 2rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            border: none;
+            padding: 12px 32px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            border: 2px solid var(--border);
+            background: transparent;
+            color: var(--text);
+            padding: 12px 32px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .stores-section {
+            padding: 2rem 0;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--text);
+        }
+
+        .filters-bar {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .filter-group {
+            margin-bottom: 1rem;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent);
+            box-shadow: none;
+        }
+
+        .store-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+
+        .store-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-color: var(--accent);
+        }
+
+        .store-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .store-address {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .store-price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .store-distance {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .store-actions {
+            margin-top: 1rem;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.875rem;
+        }
+
+        .map-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .map-placeholder {
+            height: 400px;
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--muted);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Tabs */
+        .nav-tabs {
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            color: var(--muted);
+            font-weight: 500;
+            padding: 1rem 2rem;
+            border-radius: 0;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--accent);
+            border-bottom: 2px solid var(--accent);
+            background: transparent;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .product-title {
+                font-size: 2rem;
+            }
+            
+            .product-price {
+                font-size: 1.5rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .product-image {
+                height: 300px;
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Minimal Header -->
+    <nav class="navbar-minimal">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="index.html" class="logo">
+                    Bar<span class="logo-accent">Go</span>
+                </a>
+                <div class="d-flex gap-3">
+                    <a href="../Main Page/index.html" class="back-btn">
+                        <i class="bi bi-arrow-left me-1"></i> Назад к поиску
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Product Hero Section -->
+    <section class="product-hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <img src="https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&h=400&fit=crop" 
+                         alt="Картофель" class="product-image" id="productImage">
+                </div>
+                <div class="col-lg-6">
+                    <h1 class="product-title" id="productTitle">Картофель (1 кг)</h1>
+                    <div class="product-price" id="productPrice">450 ₸</div>
+                    <div class="product-meta">
+                        <div class="d-flex gap-3 mb-2">
+                            <span><i class="bi bi-star-fill text-warning"></i> 4.3 (89 отзывов)</span>
+                            <span><i class="bi bi-geo-alt"></i> В наличии в 12 магазинах</span>
+                        </div>
+                        <p id="productDescription">Свежий картофель высшего качества. Идеально подходит для приготовления различных блюд.</p>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">
+                            <i class="bi bi-cart-plus me-2"></i> Добавить в корзину
+                        </button>
+                        <button class="btn btn-outline">
+                            <i class="bi bi-heart me-2"></i> В избранное
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stores Section -->
+    <section class="stores-section">
+        <div class="container">
+            <h2 class="section-title">Где купить</h2>
+            
+            <!-- Filters -->
+            <div class="filters-bar">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="filter-group">
+                            <label class="filter-label">Поиск магазина</label>
+                            <input type="text" class="form-control" id="shopQuery" placeholder="Название магазина">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="filter-group">
+                            <label class="filter-label">Цена от</label>
+                            <input type="number" class="form-control" id="minPrice" placeholder="Мин">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="filter-group">
+                            <label class="filter-label">Цена до</label>
+                            <input type="number" class="form-control" id="maxPrice" placeholder="Макс">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="filter-group">
+                            <label class="filter-label">Дистанция</label>
+                            <input type="number" class="form-control" id="maxDist" placeholder="км">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="filter-group">
+                            <label class="filter-label">Сортировка</label>
+                            <select class="form-select" id="sortShops">
+                                <option value="price_asc">Цена: по возрастанию</option>
+                                <option value="price_desc">Цена: по убыванию</option>
+                                <option value="distance_asc" selected>Ближайшие</option>
+                                <option value="distance_desc">Дальние</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <ul class="nav nav-tabs" id="viewTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#listPane">
+                        <i class="bi bi-list me-2"></i> Список магазинов
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#mapPane">
+                        <i class="bi bi-map me-2"></i> На карте
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- List View -->
+                <div class="tab-pane fade show active" id="listPane">
+                    <div id="shopsList">
+                        <!-- Store cards will be loaded here -->
+                        <div class="store-card">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <div class="store-name">Супермаркет "Фруктик"</div>
+                                    <div class="store-address">
+                                        <i class="bi bi-geo-alt me-1"></i> ул. Толе би, 125
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="store-price">450 ₸</div>
+                                    <div class="store-distance">0.8 км</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="store-actions">
+                                        <button class="btn btn-outline btn-sm me-2">
+                                            <i class="bi bi-signpost me-1"></i> Маршрут
+                                        </button>
+                                        <button class="btn btn-primary btn-sm">
+                                            <i class="bi bi-cart me-1"></i> В корзину
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="store-card">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <div class="store-name">Гипермаркет "Мега"</div>
+                                    <div class="store-address">
+                                        <i class="bi bi-geo-alt me-1"></i> пр. Абылай хана, 45
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="store-price">420 ₸</div>
+                                    <div class="store-distance">1.2 км</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="store-actions">
+                                        <button class="btn btn-outline btn-sm me-2">
+                                            <i class="bi bi-signpost me-1"></i> Маршрут
+                                        </button>
+                                        <button class="btn btn-primary btn-sm">
+                                            <i class="bi bi-cart me-1"></i> В корзину
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="store-card">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <div class="store-name">Магазин "У дома"</div>
+                                    <div class="store-address">
+                                        <i class="bi bi-geo-alt me-1"></i> мкр. Самал, 12
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="store-price">480 ₸</div>
+                                    <div class="store-distance">0.5 км</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="store-actions">
+                                        <button class="btn btn-outline btn-sm me-2">
+                                            <i class="bi bi-signpost me-1"></i> Маршрут
+                                        </button>
+                                        <button class="btn btn-primary btn-sm">
+                                            <i class="bi bi-cart me-1"></i> В корзину
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="shopsEmpty" class="empty-state d-none">
+                        <i class="bi bi-search"></i>
+                        <h4>Магазины не найдены</h4>
+                        <p>Попробуйте изменить параметры фильтрации</p>
+                    </div>
+                </div>
+
+                <!-- Map View -->
+                <div class="tab-pane fade" id="mapPane">
+                    <div class="map-container">
+                        <div class="map-placeholder">
+                            <div class="text-center">
+                                <i class="bi bi-map fs-1 d-block mb-2"></i>
+                                <p>Карта магазинов</p>
+                                <small>Здесь будет отображаться карта с расположением магазинов</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bootstrap JS -->
+    <script src="bootstrap-5.3.8-dist/js/bootstrap.bundle.js"></script>
+
+    <!-- Custom Scripts -->
+    <script src="productInfo.js"></script>
+</body>
+</html>
