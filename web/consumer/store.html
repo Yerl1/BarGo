@@ -1,307 +1,299 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>BarGo — Магазин</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <title>BarGo — Магазин</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Bootstrap -->
-  <link rel="stylesheet" href="bootstrap-5.3.8-dist/css/bootstrap.css" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="bootstrap-5.3.8-dist/css/bootstrap.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
 
-  <style>
-    :root {
-      --bg: #f1f5f9;
-      --card-bg: #ffffff;
-      --border: #e2e8f0;
-      --text: #0f172a;
-      --muted: #64748b;
-      --accent: #3b82f6;
-      --accent-hover: #2563eb;
-      --success: #16a34a;
-      --danger-soft: #fee2e2;
-      --danger-text: #b91c1c;
-    }
+    <style>
+        :root {
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --muted: #64748b;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #16a34a;
+            --danger-soft: #fee2e2;
+            --danger-text: #b91c1c;
+        }
 
-    body {
-      background: var(--bg);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-    }
+        body {
+            background: var(--bg);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--text);
+        }
 
-    .navbar-minimal {
-      background: #ffffffcc;
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
+        .navbar-minimal {
+            background: #ffffffcc;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
 
-    .logo {
-      font-weight: 700;
-      font-size: 1.4rem;
-      text-decoration: none;
-      color: var(--text);
-    }
+        .logo {
+            font-weight: 700;
+            font-size: 1.4rem;
+            text-decoration: none;
+            color: var(--text);
+        }
 
-    .logo span {
-      color: var(--accent);
-    }
+        .logo span {
+            color: var(--accent);
+        }
 
-    .store-hero {
-      padding: 2.5rem 0;
-      background: linear-gradient(135deg, #e0f2fe, #eef2ff);
-      margin-bottom: 2rem;
-    }
+        .store-hero {
+            padding: 2.5rem 0;
+            background: linear-gradient(135deg, #e0f2fe, #eef2ff);
+            margin-bottom: 2rem;
+        }
 
-    .store-card-main {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 1.5rem;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-      border: 1px solid #dbe3f0;
-    }
+        .store-card-main {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+            border: 1px solid #dbe3f0;
+        }
 
-    .store-photo {
-      width: 100%;
-      max-width: 420px;
-      height: 260px;
-      object-fit: cover;
-      border-radius: 14px;
-    }
+        .store-photo {
+            width: 100%;
+            max-width: 420px;
+            height: 260px;
+            object-fit: cover;
+            border-radius: 14px;
+        }
 
-    .badge-open {
-      background: #dcfce7;
-      color: #166534;
-      border-radius: 999px;
-      padding: 0.3rem 0.9rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
+        .badge-open {
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 999px;
+            padding: 0.3rem 0.9rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
 
-    .rating-chip {
-      background: #fef3c7;
-      color: #92400e;
-      border-radius: 999px;
-      padding: 0.3rem 0.9rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
+        .rating-chip {
+            background: #fef3c7;
+            color: #92400e;
+            border-radius: 999px;
+            padding: 0.3rem 0.9rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
 
-    .section-card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 1.5rem;
-      border: 1px solid var(--border);
-      margin-bottom: 1.5rem;
-    }
+        .section-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
 
-    .review-card {
-      border-radius: 12px;
-      border: 1px solid var(--border);
-    }
+        .review-card {
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
 
-    .review-card.toxic {
-      border-color: #fecaca;
-      background: #fef2f2;
-    }
+        .review-card.toxic {
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
 
-    .star {
-      color: #e5e7eb;
-      font-size: 1rem;
-    }
+        .star {
+            color: #e5e7eb;
+            font-size: 1rem;
+        }
 
-    .star.active {
-      color: #facc15;
-    }
+        .star.active {
+            color: #facc15;
+        }
 
-    .btn-primary {
-      background: var(--accent);
-      border: none;
-    }
+        .btn-primary {
+            background: var(--accent);
+            border: none;
+        }
 
-    .btn-primary:hover {
-      background: var(--accent-hover);
-    }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
 
-    .btn-outline {
-      border-color: var(--border);
-    }
+        .btn-outline {
+            border-color: var(--border);
+        }
 
-    .form-control,
-    .form-select,
-    textarea.form-control {
-      border-radius: 0.75rem;
-      border: 1px solid var(--border);
-    }
+        .form-control,
+        .form-select,
+        textarea.form-control {
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+        }
 
-    .btn-toggle-group .btn {
-      font-size: 0.75rem;
-    }
+        .btn-toggle-group .btn {
+            font-size: 0.75rem;
+        }
 
-    .btn-toggle-group .btn.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
+        .btn-toggle-group .btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
 
-    @media (max-width: 768px) {
-      .store-card-main {
-        text-align: left;
-      }
-      .store-photo {
-        margin-bottom: 1rem;
-        height: 220px;
-      }
-    }
-  </style>
+        @media (max-width: 768px) {
+            .store-card-main {
+                text-align: left;
+            }
+
+            .store-photo {
+                margin-bottom: 1rem;
+                height: 220px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-  <!-- Навбар -->
-  <nav class="navbar navbar-minimal">
-    <div class="container py-2 d-flex align-items-center justify-content-between">
-      <a href="index.html" class="logo">Bar<span>Go</span></a>
-      <a href="index.html" class="btn btn-sm btn-outline">
-        <i class="bi bi-arrow-left me-1"></i> Назад к поиску
-      </a>
-    </div>
-  </nav>
-
-  <!-- Шапка магазина -->
-  <section class="store-hero">
-    <div class="container">
-      <div class="store-card-main">
-        <div class="row g-4 align-items-center">
-          <div class="col-md-4 text-center text-md-start">
-            <img
-              id="storePhoto"
-              class="store-photo"
-              src="https://via.placeholder.com/600x400?text=Store"
-              alt="Фото магазина"
-            />
-          </div>
-          <div class="col-md-8">
-            <h1 class="h4 mb-2" id="storeTitle">Магазин</h1>
-            <div class="mb-2 text-muted" id="storeAddress">
-              <i class="bi bi-geo-alt me-1"></i>
-              Адрес будет подгружен
-            </div>
-            <p class="small text-muted mb-3" id="storeDescription">
-              Описание магазина будет подгружено с бэкенда.
-            </p>
-            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-              <span class="badge-open">Открыто сейчас</span>
-              <span class="rating-chip">
-                <i class="bi bi-star-fill me-1"></i>
-                <span id="storeRatingAvg">0.0</span>/5 •
-                <span id="storeRatingCount">0</span> отзыв(ов)
-              </span>
-            </div>
-          </div>
+    <!-- Навбар -->
+    <nav class="navbar navbar-minimal">
+        <div class="container py-2 d-flex align-items-center justify-content-between">
+            <a href="index.html" class="logo">Bar<span>Go</span></a>
+            <a href="index.html" class="btn btn-sm btn-outline">
+                <i class="bi bi-arrow-left me-1"></i> Назад к поиску
+            </a>
         </div>
-      </div>
-    </div>
-  </section>
+    </nav>
 
-  <main class="py-3">
-    <div class="container">
-      <div class="row g-4">
-        <!-- Левая колонка: отзывы -->
-        <div class="col-lg-7">
-          <div class="section-card mb-3">
-            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
-              <div>
-                <h2 class="h6 mb-0">Отзывы покупателей</h2>
-                <div class="small text-muted">
-                  Средняя оценка: <span id="infoRatingValue">0.0/5</span>,
-                  всего <span id="infoRatingCount">0</span>
+    <!-- Шапка магазина -->
+    <section class="store-hero">
+        <div class="container">
+            <div class="store-card-main">
+                <div class="row g-4 align-items-center">
+                    <div class="col-md-4 text-center text-md-start">
+                        <img id="storePhoto" class="store-photo" src="https://via.placeholder.com/600x400?text=Store"
+                            alt="Фото магазина" />
+                    </div>
+                    <div class="col-md-8">
+                        <h1 class="h4 mb-2" id="storeTitle">Магазин</h1>
+                        <div class="mb-2 text-muted" id="storeAddress">
+                            <i class="bi bi-geo-alt me-1"></i>
+                            Адрес будет подгружен
+                        </div>
+                        <p class="small text-muted mb-3" id="storeDescription">
+                            Описание магазина будет подгружено с бэкенда.
+                        </p>
+                        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                            <span class="badge-open">Открыто сейчас</span>
+                            <span class="rating-chip">
+                                <i class="bi bi-star-fill me-1"></i>
+                                <span id="storeRatingAvg">0.0</span>/5 •
+                                <span id="storeRatingCount">0</span> отзыв(ов)
+                            </span>
+                        </div>
+                    </div>
                 </div>
-              </div>
-              <div class="btn-group btn-group-sm btn-toggle-group" id="commentsFilter">
-                <button type="button" class="btn btn-outline-primary active" data-filter="all">
-                  Все
-                </button>
-                <button type="button" class="btn btn-outline-primary" data-filter="non_toxic">
-                  Нейтральные
-                </button>
-                <button type="button" class="btn btn-outline-primary" data-filter="toxic">
-                  Токсичные
-                </button>
-              </div>
             </div>
-
-            <div id="reviewsList" class="vstack gap-3">
-              <!-- сюда будут добавляться отзывы -->
-            </div>
-
-            <div id="reviewsEmpty" class="text-muted small text-center py-3">
-              Пока нет ни одного отзыва — будьте первым!
-            </div>
-          </div>
-
-          <!-- Форма нового отзыва -->
-          <div class="section-card">
-            <h3 class="h6 mb-3">Оставить отзыв</h3>
-            <form id="reviewForm" class="vstack gap-3">
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <label for="rfName" class="form-label small mb-1">Ваше имя (необязательно)</label>
-                  <input type="text" id="rfName" class="form-control" placeholder="Покупатель" />
-                </div>
-                <div class="col-md-6">
-                  <label for="rfRating" class="form-label small mb-1">Оценка</label>
-                  <select id="rfRating" class="form-select" required>
-                    <option value="5" selected>5 — Отлично</option>
-                    <option value="4">4 — Хорошо</option>
-                    <option value="3">3 — Нормально</option>
-                    <option value="2">2 — Плохо</option>
-                    <option value="1">1 — Ужасно</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label for="rfText" class="form-label small mb-1">Комментарий</label>
-                <textarea
-                  id="rfText"
-                  class="form-control"
-                  rows="4"
-                  minlength="3"
-                  maxlength="1000"
-                  placeholder="Расскажите, что вам понравилось или нет"
-                  required
-                ></textarea>
-              </div>
-
-              <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <div class="small text-muted">
-                  Нажимая «Отправить», вы соглашаетесь с публикацией вашего отзыва.
-                </div>
-                <button type="submit" class="btn btn-primary">
-                  <i class="bi bi-send me-1"></i> Отправить отзыв
-                </button>
-              </div>
-
-              <div id="reviewError" class="text-danger small d-none"></div>
-              <div id="reviewSuccess" class="text-success small d-none">Отзыв отправлен!</div>
-            </form>
-          </div>
         </div>
+    </section>
 
-        <!-- Правая колонка: заглушка для товаров/карты -->
-        <div class="col-lg-5">
-          <div class="section-card">
-            <h3 class="h6 mb-2">Товары этого магазина</h3>
-            <p class="small text-muted mb-0">
-              Здесь можно вывести список товаров из этого магазина, если подключить соответствующий эндпоинт.
-            </p>
-          </div>
+    <main class="py-3">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Левая колонка: отзывы -->
+                <div class="col-lg-7">
+                    <div class="section-card mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                            <div>
+                                <h2 class="h6 mb-0">Отзывы покупателей</h2>
+                                <div class="small text-muted">
+                                    Средняя оценка: <span id="infoRatingValue">0.0/5</span>,
+                                    всего <span id="infoRatingCount">0</span>
+                                </div>
+                            </div>
+                            <div class="btn-group btn-group-sm btn-toggle-group" id="commentsFilter">
+                                <button type="button" class="btn btn-outline-primary active" data-filter="all">
+                                    Все
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" data-filter="non_toxic">
+                                    Нейтральные
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" data-filter="toxic">
+                                    Токсичные
+                                </button>
+                            </div>
+                        </div>
 
-          <div class="section-card">
-            <h3 class="h6 mb-2">Расположение на карте</h3>
-            <p class="small text-muted mb-2">
-              Координаты магазина: <span id="storeCoords">—</span>
-            </p>
-            <div
-              style="
+                        <div id="reviewsList" class="vstack gap-3">
+                            <!-- сюда будут добавляться отзывы -->
+                        </div>
+
+                        <div id="reviewsEmpty" class="text-muted small text-center py-3">
+                            Пока нет ни одного отзыва — будьте первым!
+                        </div>
+                    </div>
+
+                    <!-- Форма нового отзыва -->
+                    <div class="section-card">
+                        <h3 class="h6 mb-3">Оставить отзыв</h3>
+                        <form id="reviewForm" class="vstack gap-3">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="rfName" class="form-label small mb-1">Ваше имя (необязательно)</label>
+                                    <input type="text" id="rfName" class="form-control" placeholder="Покупатель" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="rfRating" class="form-label small mb-1">Оценка</label>
+                                    <select id="rfRating" class="form-select" required>
+                                        <option value="5" selected>5 — Отлично</option>
+                                        <option value="4">4 — Хорошо</option>
+                                        <option value="3">3 — Нормально</option>
+                                        <option value="2">2 — Плохо</option>
+                                        <option value="1">1 — Ужасно</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="rfText" class="form-label small mb-1">Комментарий</label>
+                                <textarea id="rfText" class="form-control" rows="4" minlength="3" maxlength="1000"
+                                    placeholder="Расскажите, что вам понравилось или нет" required></textarea>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <div class="small text-muted">
+                                    Нажимая «Отправить», вы соглашаетесь с публикацией вашего отзыва.
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-send me-1"></i> Отправить отзыв
+                                </button>
+                            </div>
+
+                            <div id="reviewError" class="text-danger small d-none"></div>
+                            <div id="reviewSuccess" class="text-success small d-none">Отзыв отправлен!</div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Правая колонка: заглушка для товаров/карты -->
+                <div class="col-lg-5">
+                    <div class="section-card">
+                        <h3 class="h6 mb-2">Товары этого магазина</h3>
+                        <p class="small text-muted mb-0">
+                            Здесь можно вывести список товаров из этого магазина, если подключить соответствующий
+                            эндпоинт.
+                        </p>
+                    </div>
+
+                    <div class="section-card">
+                        <h3 class="h6 mb-2">Расположение на карте</h3>
+                        <p class="small text-muted mb-2">
+                            Координаты магазина: <span id="storeCoords">—</span>
+                        </p>
+                        <div style="
                 width: 100%;
                 height: 220px;
                 border-radius: 12px;
@@ -317,297 +309,302 @@
                 justify-content:center;
                 color:#64748b;
                 font-size:0.9rem;
-              "
-            >
-              Здесь можно подключить карту (Leaflet / Яндекс / Google)
+              ">
+                            Здесь можно подключить карту (Leaflet / Яндекс / Google)
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
-  </main>
+    </main>
 
-  <script src="bootstrap-5.3.8-dist/js/bootstrap.bundle.js"></script>
+    <script src="bootstrap-5.3.8-dist/js/bootstrap.bundle.js"></script>
 
-  <script>
-    const API_BASE = "http://localhost:3002";
+    <script>
+        const API_BASE = "http://localhost:3002";
 
-    // TODO: вместо хардкода подставь реальный user_id из своей auth-системы
-    const CURRENT_USER_ID =
-      localStorage.getItem("bargo_user_id") ||
-      "7c85a8a1-1d54-4467-bb50-e2a4cf7512ef";
+        // TODO: вместо хардкода подставь реальный user_id из своей auth-системы
+        const CURRENT_USER_ID =
+            localStorage.getItem("bargo_user_id") ||
+            "7c85a8a1-1d54-4467-bb50-e2a4cf7512ef";
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const params = new URLSearchParams(window.location.search);
-      const storeId = params.get("id");
-      if (!storeId) {
-        console.error("Нет параметра id в URL (store.html?id=STORE_ID)");
-        return;
-      }
+        document.addEventListener("DOMContentLoaded", () => {
+            const params = new URLSearchParams(window.location.search);
+            const storeId = params.get("id");
+            if (!storeId) {
+                console.error("Нет параметра id в URL (store.html?id=STORE_ID)");
+                return;
+            }
 
-      const $storeTitle = document.getElementById("storeTitle");
-      const $storeAddress = document.getElementById("storeAddress");
-      const $storeDescription = document.getElementById("storeDescription");
-      const $storePhoto = document.getElementById("storePhoto");
-      const $storeRatingAvg = document.getElementById("storeRatingAvg");
-      const $storeRatingCount = document.getElementById("storeRatingCount");
-      const $storeCoords = document.getElementById("storeCoords");
+            const $storeTitle = document.getElementById("storeTitle");
+            const $storeAddress = document.getElementById("storeAddress");
+            const $storeDescription = document.getElementById("storeDescription");
+            const $storePhoto = document.getElementById("storePhoto");
+            const $storeRatingAvg = document.getElementById("storeRatingAvg");
+            const $storeRatingCount = document.getElementById("storeRatingCount");
+            const $storeCoords = document.getElementById("storeCoords");
 
-      const $reviewsList = document.getElementById("reviewsList");
-      const $reviewsEmpty = document.getElementById("reviewsEmpty");
-      const $infoRatingValue = document.getElementById("infoRatingValue");
-      const $infoRatingCount = document.getElementById("infoRatingCount");
+            const $reviewsList = document.getElementById("reviewsList");
+            const $reviewsEmpty = document.getElementById("reviewsEmpty");
+            const $infoRatingValue = document.getElementById("infoRatingValue");
+            const $infoRatingCount = document.getElementById("infoRatingCount");
 
-      const $reviewForm = document.getElementById("reviewForm");
-      const $rfName = document.getElementById("rfName");
-      const $rfRating = document.getElementById("rfRating");
-      const $rfText = document.getElementById("rfText");
-      const $revError = document.getElementById("reviewError");
-      const $revSuccess = document.getElementById("reviewSuccess");
+            const $reviewForm = document.getElementById("reviewForm");
+            const $rfName = document.getElementById("rfName");
+            const $rfRating = document.getElementById("rfRating");
+            const $rfText = document.getElementById("rfText");
+            const $revError = document.getElementById("reviewError");
+            const $revSuccess = document.getElementById("reviewSuccess");
 
-      const $filterBtns = document.querySelectorAll(
-        "#commentsFilter button[data-filter]"
-      );
+            const $filterBtns = document.querySelectorAll(
+                "#commentsFilter button[data-filter]"
+            );
 
-      let backendReviews = []; // из GET /comments
-      let localReviews = [];   // только что добавленные на фронте
-      let filterMode = "all";  // all | non_toxic | toxic
+            let backendReviews = []; // из GET /comments
+            let localReviews = [];   // только что добавленные на фронте
+            let filterMode = "all";  // all | non_toxic | toxic
 
-      // ---------- Загрузка данных магазина ----------
-      fetch(`${API_BASE}/stores/${encodeURIComponent(storeId)}`)
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to load store: " + res.status);
-          return res.json();
-        })
-        .then((store) => {
-          if (store.name) $storeTitle.textContent = store.name;
-          if (store.address) {
-            $storeAddress.innerHTML =
-              '<i class="bi bi-geo-alt me-1"></i> ' + store.address;
-          }
-          if (store.description) {
-            $storeDescription.textContent = store.description;
-          }
-          if (store.photo) {
-            $storePhoto.src = store.photo;
-            $storePhoto.alt = store.name || "Магазин";
-          }
-          if (typeof store.average_rating === "number") {
-            const avg = store.average_rating.toFixed(1);
-            $storeRatingAvg.textContent = avg;
-            $infoRatingValue.textContent = avg + "/5";
-          }
-          if (typeof store.review_count === "number") {
-            $storeRatingCount.textContent = store.review_count;
-            $infoRatingCount.textContent = store.review_count;
-          }
-          if (store.latitude && store.longitude) {
-            $storeCoords.textContent = store.latitude + ", " + store.longitude;
-          } else {
-            $storeCoords.textContent = "координаты неизвестны";
-          }
-        })
-        .catch((err) => console.error(err));
+            // ---------- Загрузка данных магазина ----------
+            fetch(`${API_BASE}/stores/${encodeURIComponent(storeId)}`)
+                .then((res) => {
+                    if (!res.ok) throw new Error("Failed to load store: " + res.status);
+                    return res.json();
+                })
+                .then((store) => {
+                    if (store.name) $storeTitle.textContent = store.name;
+                    if (store.address) {
+                        $storeAddress.innerHTML =
+                            '<i class="bi bi-geo-alt me-1"></i> ' + store.address;
+                    }
+                    if (store.description) {
+                        $storeDescription.textContent = store.description;
+                    }
+                    if (store.photo) {
+                        $storePhoto.src = store.photo;
+                        $storePhoto.alt = store.name || "Магазин";
+                    }
+                    if (typeof store.average_rating === "number") {
+                        const avg = store.average_rating.toFixed(1);
+                        $storeRatingAvg.textContent = avg;
+                        $infoRatingValue.textContent = avg + "/5";
+                    }
+                    if (typeof store.review_count === "number") {
+                        $storeRatingCount.textContent = store.review_count;
+                        $infoRatingCount.textContent = store.review_count;
+                    }
+                    if (store.latitude && store.longitude) {
+                        $storeCoords.textContent = store.latitude + ", " + store.longitude;
+                    } else {
+                        $storeCoords.textContent = "координаты неизвестны";
+                    }
+                })
+                .catch((err) => console.error(err));
 
-      // ---------- Загрузка комментариев с бэка ----------
-      function loadCommentsFromBackend() {
-        fetch(
-          `${API_BASE}/stores/${encodeURIComponent(
-            storeId
-          )}/comments`
-        )
-          .then((res) => {
-            if (!res.ok)
-              throw new Error("Failed to load comments: " + res.status);
-            return res.json();
-          })
-          .then((comments) => {
-            backendReviews = (comments || []).map((c) => ({
-              source: "backend",
-              id: c.comment_id,
-              name: "Покупатель", // если захотите — подставите логин из бэка
-              rating: c.rating || 0,
-              text: c.content || "",
-              isToxic: !!c.is_toxic,
-              date: null,
-            }));
-            rerenderReviews();
-          })
-          .catch((err) => console.error(err));
-      }
+            // ---------- Загрузка комментариев с бэка ----------
+            function loadCommentsFromBackend() {
+                fetch(
+                    `${API_BASE}/stores/${encodeURIComponent(
+                        storeId
+                    )}/comments`
+                )
+                    .then((res) => {
+                        if (!res.ok)
+                            throw new Error("Failed to load comments: " + res.status);
+                        return res.json();
+                    })
+                    .then((comments) => {
+                        backendReviews = (comments || []).map((c) => ({
+                            source: "backend",
+                            id: c.comment_id,
+                            name: "Покупатель", // если захотите — подставите логин из бэка
+                            rating: c.rating || 0,
+                            text: c.content || "",
+                            isToxic: !!c.is_toxic,
+                            date: null,
+                        }));
+                        rerenderReviews();
+                    })
+                    .catch((err) => console.error(err));
+            }
 
-      // ---------- Вспомогательные функции для отзывов ----------
-      function createReviewNode(review) {
-        const item = document.createElement("article");
-        item.className = "card review-card p-3";
-        if (review.isToxic) {
-          item.classList.add("toxic");
-        }
+            // ---------- Вспомогательные функции для отзывов ----------
+            function createReviewNode(review) {
+                const item = document.createElement("article");
+                item.className = "card review-card p-3";
+                if (review.isToxic) {
+                    item.classList.add("toxic");
+                }
 
-        const stars = [];
-        const rating = Number(review.rating) || 0;
-        for (let i = 1; i <= 5; i++) {
-          const active = i <= rating ? "active" : "";
-          stars.push(`<i class="bi bi-star-fill star ${active}"></i>`);
-        }
+                const stars = [];
+                const rating = Number(review.rating) || 0;
+                for (let i = 1; i <= 5; i++) {
+                    const active = i <= rating ? "active" : "";
+                    stars.push(`<i class="bi bi-star-fill star ${active}"></i>`);
+                }
 
-        const displayName = review.name || "Покупатель";
-        const displayDate = review.date
-          ? new Date(review.date).toLocaleDateString()
-          : "";
+                const displayName = review.name || "Покупатель";
+                const displayDate = review.date
+                    ? new Date(review.date).toLocaleDateString()
+                    : "";
 
-        item.innerHTML = `
+                item.innerHTML = `
           <div class="d-flex justify-content-between align-items-start mb-1">
             <div>
               <div class="fw-semibold">${displayName}</div>
-              ${
-                displayDate
-                  ? `<div class="small text-muted">${displayDate}</div>`
-                  : ""
-              }
+              ${displayDate
+                        ? `<div class="small text-muted">${displayDate}</div>`
+                        : ""
+                    }
             </div>
             <div>${stars.join("")}</div>
           </div>
           <p class="mb-0 small">${review.text}</p>
-          ${
-            review.isToxic
-              ? `<div class="mt-2 small" style="color:${"var(--danger-text)"}">
+          ${review.isToxic
+                        ? `<div class="mt-2 small" style="color:${"var(--danger-text)"}">
                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
                    Помечено как токсичный комментарий
                  </div>`
-              : ""
-          }
+                        : ""
+                    }
         `;
-        return item;
-      }
+                return item;
+            }
 
-      function getAllReviews() {
-        return [...backendReviews, ...localReviews];
-      }
+            function getAllReviews() {
+                return [...backendReviews, ...localReviews];
+            }
 
-      function getFilteredReviews() {
-        const all = getAllReviews();
-        if (filterMode === "non_toxic") {
-          return all.filter((r) => !r.isToxic);
-        }
-        if (filterMode === "toxic") {
-          return all.filter((r) => r.isToxic);
-        }
-        return all;
-      }
+            function getFilteredReviews() {
+                const all = getAllReviews();
+                if (filterMode === "non_toxic") {
+                    return all.filter((r) => !r.isToxic);
+                }
+                if (filterMode === "toxic") {
+                    return all.filter((r) => r.isToxic);
+                }
+                return all;
+            }
 
-      function recalcRatingFromAll() {
-        const all = getAllReviews();
-        if (!all.length) {
-          $infoRatingValue.textContent = "0.0/5";
-          $infoRatingCount.textContent = "0";
-          return;
-        }
-        const sum = all.reduce((acc, r) => acc + (Number(r.rating) || 0), 0);
-        const avg = (sum / all.length).toFixed(1);
-        $infoRatingValue.textContent = avg + "/5";
-        $infoRatingCount.textContent = String(all.length);
-      }
+            function recalcRatingFromAll() {
+                const all = getAllReviews();
+                if (!all.length) {
+                    $infoRatingValue.textContent = "0.0/5";
+                    $infoRatingCount.textContent = "0";
+                    return;
+                }
+                const sum = all.reduce((acc, r) => acc + (Number(r.rating) || 0), 0);
+                const avg = (sum / all.length).toFixed(1);
+                $infoRatingValue.textContent = avg + "/5";
+                $infoRatingCount.textContent = String(all.length);
+            }
 
-      function rerenderReviews() {
-        const list = getFilteredReviews();
-        $reviewsList.innerHTML = "";
-        if (!list.length) {
-          $reviewsEmpty.classList.remove("d-none");
-        } else {
-          $reviewsEmpty.classList.add("d-none");
-          list.forEach((r) =>
-            $reviewsList.appendChild(createReviewNode(r))
-          );
-        }
-        recalcRatingFromAll();
-      }
+            function rerenderReviews() {
+                const list = getFilteredReviews();
+                $reviewsList.innerHTML = "";
+                if (!list.length) {
+                    $reviewsEmpty.classList.remove("d-none");
+                } else {
+                    $reviewsEmpty.classList.add("d-none");
+                    list.forEach((r) =>
+                        $reviewsList.appendChild(createReviewNode(r))
+                    );
+                }
+                recalcRatingFromAll();
+            }
 
-      // ---------- POST комментария в бэк ----------
-      async function sendReviewToBackend({ rating, text }) {
-        if (!CURRENT_USER_ID) {
-          console.warn("Нет CURRENT_USER_ID — отзыв не отправлен в бэк");
-          return;
-        }
+            // ---------- POST комментария в бэк ----------
+            async function sendReviewToBackend({ rating, text }) {
+                if (!CURRENT_USER_ID) {
+                    console.warn("Нет CURRENT_USER_ID — отзыв не отправлен в бэк");
+                    return;
+                }
 
-        const payload = {
-          user_id: CURRENT_USER_ID,
-          content: text,
-          rating: rating,
-        };
+                const payload = {
+                    user_id: CURRENT_USER_ID,
+                    content: text,
+                    rating: rating,
+                };
 
-        const res = await fetch(
-          `${API_BASE}/stores/${encodeURIComponent(
-            storeId
-          )}/comments`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          }
-        );
+                const res = await fetch(
+                    `${API_BASE}/stores/${encodeURIComponent(
+                        storeId
+                    )}/comments`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload),
+                    }
+                );
 
-        if (!res.ok) {
-          const msg = await res.text().catch(() => "");
-          throw new Error("Failed to send comment: " + res.status + " " + msg);
-        }
-      }
+                if (!res.ok) {
+                    const msg = await res.text().catch(() => "");
+                    throw new Error("Failed to send comment: " + res.status + " " + msg);
+                }
+            }
+            const API_BASE = "http://localhost:3002";
 
-      // ---------- Обработка формы нового отзыва ----------
-      $reviewForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        $revError.classList.add("d-none");
-        $revSuccess.classList.add("d-none");
 
-        const name = $rfName.value.trim() || "Покупатель";
-        const rating = Number($rfRating.value || 5);
-        const text = $rfText.value.trim();
+            // ---------- Обработка формы нового отзыва ----------
+            $reviewForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
 
-        if (!text || text.length < 3) {
-          $revError.textContent = "Напишите, пожалуйста, хотя бы пару слов.";
-          $revError.classList.remove("d-none");
-          $rfText.focus();
-          return;
-        }
+                $revError.classList.add("d-none");
+                $revSuccess.classList.add("d-none");
 
-        const newReview = {
-          source: "local",
-          name,
-          rating,
-          text,
-          isToxic: false, // локально считаем отзыв нетоксичным
-          date: new Date().toISOString(),
-        };
+                const token = localStorage.getItem("jwt");
 
-        localReviews.push(newReview);
-        rerenderReviews();
-        $reviewForm.reset();
+                const rating = Number($rfRating.value || 5);
+                const content = $rfText.value.trim();
 
-        try {
-          await sendReviewToBackend({ rating, text });
-          $revSuccess.textContent = "Отзыв отправлен!";
-          $revSuccess.classList.remove("d-none");
-        } catch (err) {
-          console.error(err);
-          $revError.textContent =
-            "Не удалось отправить отзыв на сервер. Он сохранён только локально.";
-          $revError.classList.remove("d-none");
-        }
-      });
+                if (!content || content.length < 2) {
+                    $revError.textContent = "Напишите хотя бы пару слов.";
+                    $revError.classList.remove("d-none");
+                    return;
+                }
 
-      // ---------- Переключение фильтра (все / нетокс / токс) ----------
-      $filterBtns.forEach((btn) => {
-        btn.addEventListener("click", () => {
-          $filterBtns.forEach((b) => b.classList.remove("active"));
-          btn.classList.add("active");
-          filterMode = btn.dataset.filter || "all";
-          rerenderReviews();
+                const payload = {
+                    content: content,
+                    rating: rating,
+                };
+
+                try {
+                    const res = await fetch(
+                        `${API_BASE}/stores/${encodeURIComponent(storeId)}/comments`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${token}`,
+                            },
+                            body: JSON.stringify(payload),
+                        }
+                    );
+
+                    if (!res.ok) {
+                        const msg = await res.text();
+                        throw new Error(msg || res.status);
+                    }
+
+                    // Успех
+                    $reviewForm.reset();
+                    $revSuccess.textContent = "Комментарий отправлен!";
+                    $revSuccess.classList.remove("d-none");
+
+                    // Перезагружаем комменты с бэка чтобы увидеть новый
+                    loadCommentsFromBackend();
+
+                } catch (err) {
+                    console.error("Error posting comment:", err);
+                    $revError.textContent = "Ошибка отправки. Попробуйте снова.";
+                    $revError.classList.remove("d-none");
+                }
+            });
+
+
+            // начальная загрузка комментариев
+            loadCommentsFromBackend();
         });
-      });
-
-      // начальная загрузка комментариев
-      loadCommentsFromBackend();
-    });
-  </script>
+    </script>
 </body>
+
 </html>
