@@ -15,9 +15,7 @@ async function initProductDetails() {
 
   try {
     const resp = await fetch(
-      `http://localhost:3002/product-info?product_id=${encodeURIComponent(
-        productId
-      )}`
+      `http://localhost:3002/product-info?product_id=${encodeURIComponent(productId)}`
     );
     if (!resp.ok)
       throw new Error(`Failed to load product info: ${resp.status}`);
@@ -26,7 +24,9 @@ async function initProductDetails() {
     if (!data || !data.product) return;
 
     const product = data.product;
+    const stores = data.stores || [];
 
+    // === Подставляем данные товара ===
     const imgEl = document.getElementById("productImage");
     if (imgEl && product.photo) {
       imgEl.src = product.photo;
@@ -35,17 +35,24 @@ async function initProductDetails() {
 
     if (product.name)
       document.getElementById("productTitle").textContent = product.name;
+
     if (typeof product.price === "number")
-      document.getElementById(
-        "productPrice"
-      ).textContent = `${product.price} ₸`;
+      document.getElementById("productPrice").textContent = `${product.price} ₸`;
+
     if (product.description)
       document.getElementById("productDescription").textContent =
         product.description;
+
+    // === ГЛАВНОЕ! Рендерим магазины из API ===
+    if (stores.length > 0) {
+      renderShopsFromApi(stores);
+    }
+
   } catch (err) {
     console.error("Error loading product info:", err);
   }
 }
+
 
 // ------ Stores list / filters ------
 
@@ -111,6 +118,13 @@ function renderShopsFromApi(shops) {
 function createShopCard(shop) {
   const card = document.createElement("div");
   card.className = "store-card";
+  card.style.cursor = "pointer";
+
+  card.addEventListener("click", () => {
+    if (shop.id) {
+      window.location.href = `store.html?id=${shop.id}`;
+    }
+  });
 
   const price = shop.price ?? 0;
   const distance = shop.distance_km ?? null;
@@ -133,10 +147,10 @@ function createShopCard(shop) {
         </div>
         <div class="col-md-3">
           <div class="store-actions">
-            <button class="btn btn-outline btn-sm me-2 js-route-btn">
+            <button class="btn btn-outline btn-sm me-2 js-route-btn" onclick="event.stopPropagation()">
               <i class="bi bi-signpost me-1"></i> Маршрут
             </button>
-            <button class="btn btn-primary btn-sm js-add-to-cart">
+            <button class="btn btn-primary btn-sm js-add-to-cart" onclick="event.stopPropagation()">
               <i class="bi bi-cart me-1"></i> В корзину
             </button>
           </div>
@@ -146,6 +160,7 @@ function createShopCard(shop) {
 
   return card;
 }
+
 
 function initStoreFilters() {
   const shopQuery = document.getElementById("shopQuery");
