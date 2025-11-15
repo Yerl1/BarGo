@@ -1,408 +1,558 @@
 <!DOCTYPE html>
 <html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BarGo - Поиск товаров</title>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BarGo - Поиск товаров</title>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="./bootstrap-5.3.8-dist/css/bootstrap.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
 
-  <!-- Bootstrap -->
-  <link rel="stylesheet" href="bootstrap-5.3.8-dist/css/bootstrap.css" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
 
-  <!-- Google Fonts -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;500;700&display=swap"
-    rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"
+    />
 
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="style.css" />
-</head>
-
-<body>
-  <!-- Header -->
-  <header class="header">
-    <div class="container h-100">
-      <div class="d-flex align-items-center justify-content-between h-100">
-        <div class="d-flex align-items-center gap-4">
-          <button class="icon-btn d-lg-none" id="sidebarToggle">
-            <i class="bi bi-list"></i>
-          </button>
-          <a href="#" class="logo d-flex align-items-center gap-2">
-            <i class="bi bi-cart"></i>
-            <span>BarGo</span>
-          </a>
-        </div>
-
-        <form id="searchForm" class="d-flex align-items-center gap-3" autocomplete="off">
-          <div class="position-relative">
-            <input type="text" class="search-input" placeholder="Поиск товаров" id="q">
-            <i class="bi bi-search position-absolute"
-               style="right: 16px; top: 50%; transform: translateY(-50%); color: var(--muted);"></i>
-          </div>
-        
-          <button type="button" class="icon-btn" id="clearBtn">
-            <i class="bi bi-x-lg"></i>
-          </button>        
-
-          <div class="d-flex gap-2">
-            <button class="icon-btn">
-              <i class="bi bi-chat"></i>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="container h-100">
+        <div class="d-flex align-items-center justify-content-between h-100">
+          <div class="d-flex align-items-center gap-4">
+            <button class="icon-btn d-lg-none" id="sidebarToggle">
+              <i class="bi bi-list"></i>
             </button>
-            <button class="icon-btn">
-              <i class="bi bi-bell"></i>
+            <a href="#" class="logo d-flex align-items-center gap-2">
+              <i class="bi bi-cart"></i>
+              <span>BarGo</span>
+            </a>
+          </div>
+
+          <form
+            id="searchForm"
+            class="d-flex align-items-center gap-3"
+            autocomplete="off"
+          >
+            <div class="position-relative">
+              <input
+                type="text"
+                class="search-input"
+                placeholder="Поиск товаров"
+                id="q"
+              />
+              <i
+                class="bi bi-search position-absolute"
+                style="
+                  right: 16px;
+                  top: 50%;
+                  transform: translateY(-50%);
+                  color: var(--muted);
+                "
+              ></i>
+            </div>
+
+            <button type="button" class="icon-btn" id="clearBtn">
+              <i class="bi bi-x-lg"></i>
             </button>
-            <div class="dropdown">
-              <button class="icon-btn dropdown-toggle d-flex align-items-center gap-2" id="userButton"
-                data-bs-toggle="dropdown">
-                <img
-                  src="https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3485.jpg?semt=ais_hybrid&w=740&q=80"
-                  alt="User Photo" class="rounded-circle" width="32" height="32" id="userAvatar">
-                <span id="userName" class="fw-semibold">Гость</span>
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end" id="userMenu">
-                <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-square me-2"></i>Редактировать профиль</a>
-                </li>
-                <li>
-                  <hr class="dropdown-divider">
-                </li>
-                <li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i
-                      class="bi bi-box-arrow-right me-2"></i>Выйти</a></li>
-              </ul>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-  </header>
 
-  <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar">
-    <nav class="sidebar-nav">
-      <a href="#" class="nav-link active">
-        <i class="bi bi-house me-3"></i>Главная
-      </a>
-      <a href="#" class="nav-link">
-        <i class="bi bi-bookmark me-3"></i>Избранное
-      </a>
-      <a href="#" class="nav-link">
-        <i class="bi bi-person me-3"></i>Профиль
-      </a>
-      <a href="#" class="nav-link">
-        <i class="bi bi-telephone me-3"></i>Контакты
-      </a>
-      <a href="#" class="nav-link">
-        <i class="bi bi-gear me-3"></i>Настройки
-      </a>
-    </nav>
-  </aside>
-
-  <!-- Auth Modal -->
-  <div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content rounded-4 shadow">
-        <div class="modal-header border-0">
-          <h5 class="modal-title" id="authModalLabel">Вход в аккаунт</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Login Form -->
-          <form id="loginForm" autocomplete="off">
-            <div class="mb-3">
-              <label for="loginEmail" class="form-label">Email</label>
-              <input type="email" class="form-control" id="loginEmail" placeholder="Введите email" required>
-            </div>
-            <div class="mb-3">
-              <label for="loginPassword" class="form-label">Пароль</label>
-              <input type="password" class="form-control" id="loginPassword" placeholder="Введите пароль" required>
-            </div>
-            <div id="loginError" class="text-danger small d-none mb-2"></div>
-            <button type="submit" class="btn btn-primary w-100">Войти</button>
-          </form>
-
-          <!-- Register Form -->
-          <form id="signupForm" class="d-none mt-3" autocomplete="off">
-            <div class="row">
-              <div class="col-md-6 mb-2">
-                <input type="text" class="form-control" id="signupFirstname" placeholder="Имя" required>
-              </div>
-              <div class="col-md-6 mb-2">
-                <input type="text" class="form-control" id="signupLastname" placeholder="Фамилия" required>
-              </div>
-            </div>
-            <div class="mb-2">
-              <input type="email" class="form-control" id="signupEmail" placeholder="Email" required>
-            </div>
-            <div class="mb-2">
-              <input type="tel" class="form-control" id="signupPhone" placeholder="Телефон" required>
-            </div>
-            <div class="mb-2">
-              <input type="password" class="form-control" id="signupPassword" placeholder="Пароль" required>
-            </div>
-            <div id="signupError" class="text-danger small d-none mb-2"></div>
-            <button type="submit" class="btn btn-success w-100">Создать аккаунт</button>
-          </form>
-          <!-- Switch link -->
-          <div class="text-center mt-3">
-            <a href="#" id="switchAuth" class="small text-primary">Нет аккаунта? Зарегистрируйтесь</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Content -->
-  <main class="main-content">
-    <h1 class="page-title">Товары</h1>
-
-    <!-- Filters Section -->
-    <section class="filters-section">
-      <div class="row g-3">
-        <div class="col-md-3">
-          <div class="filter-group">
-            <label class="filter-label">Категория</label>
-            <select class="filter-select" id="categoryFilter">
-              <option value="">Все категории</option>
-              <option value="овощи">Овощи</option>
-              <option value="молочные">Молочные продукты</option>
-              <option value="хлеб">Хлеб</option>
-              <option value="яйца">Яйца</option>
-              <option value="мясо">Мясо</option>
-              <option value="электроника">Электроника</option>
-            </select>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="filter-group">
-            <label class="filter-label">Бренд</label>
-            <select class="filter-select" id="brandFilter">
-              <option value="">Все бренды</option>
-              <option value="duracell">Duracell</option>
-            </select>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="filter-group">
-            <label class="filter-label">Ценовой диапазон</label>
             <div class="d-flex gap-2">
-              <input type="number" class="filter-input" placeholder="Мин" id="priceMin">
-              <input type="number" class="filter-input" placeholder="Макс" id="priceMax">
+              <button class="icon-btn">
+                <i class="bi bi-chat"></i>
+              </button>
+              <button class="icon-btn">
+                <i class="bi bi-bell"></i>
+              </button>
+              <div class="dropdown">
+                <button
+                  class="icon-btn dropdown-toggle d-flex align-items-center gap-2"
+                  id="userButton"
+                  data-bs-toggle="dropdown"
+                >
+                  <img
+                    src="https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3485.jpg?semt=ais_hybrid&w=740&q=80"
+                    alt="User Photo"
+                    class="rounded-circle"
+                    width="32"
+                    height="32"
+                    id="userAvatar"
+                  />
+                  <span id="userName" class="fw-semibold">Гость</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" id="userMenu">
+                  <li>
+                    <a class="dropdown-item" href="#"
+                      ><i class="bi bi-pencil-square me-2"></i>Редактировать
+                      профиль</a
+                    >
+                  </li>
+                  <li>
+                    <hr class="dropdown-divider" />
+                  </li>
+                  <li>
+                    <a class="dropdown-item text-danger" href="#" id="logoutBtn"
+                      ><i class="bi bi-box-arrow-right me-2"></i>Выйти</a
+                    >
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-link active">
+          <i class="bi bi-house me-3"></i>Главная
+        </a>
+        <a href="#" class="nav-link">
+          <i class="bi bi-bookmark me-3"></i>Избранное
+        </a>
+        <a href="#" class="nav-link">
+          <i class="bi bi-person me-3"></i>Профиль
+        </a>
+        <a href="#" class="nav-link">
+          <i class="bi bi-telephone me-3"></i>Контакты
+        </a>
+        <a href="#" class="nav-link">
+          <i class="bi bi-gear me-3"></i>Настройки
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Auth Modal -->
+    <div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+          <div class="modal-header border-0">
+            <h5 class="modal-title" id="authModalLabel">Вход в аккаунт</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Закрыть"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <!-- Login Form -->
+            <form id="loginForm" autocomplete="off">
+              <div class="mb-3">
+                <label for="loginEmail" class="form-label">Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="loginEmail"
+                  placeholder="Введите email"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="loginPassword" class="form-label">Пароль</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="loginPassword"
+                  placeholder="Введите пароль"
+                  required
+                />
+              </div>
+              <div id="loginError" class="text-danger small d-none mb-2"></div>
+              <button type="submit" class="btn btn-primary w-100">Войти</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="signupForm" class="d-none mt-3" autocomplete="off">
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="signupFirstname"
+                    placeholder="Имя"
+                    required
+                  />
+                </div>
+                <div class="col-md-6 mb-2">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="signupLastname"
+                    placeholder="Фамилия"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="mb-2">
+                <input
+                  type="email"
+                  class="form-control"
+                  id="signupEmail"
+                  placeholder="Email"
+                  required
+                />
+              </div>
+              <div class="mb-2">
+                <input
+                  type="tel"
+                  class="form-control"
+                  id="signupPhone"
+                  placeholder="Телефон"
+                  required
+                />
+              </div>
+              <div class="mb-2">
+                <input
+                  type="password"
+                  class="form-control"
+                  id="signupPassword"
+                  placeholder="Пароль"
+                  required
+                />
+              </div>
+              <div id="signupError" class="text-danger small d-none mb-2"></div>
+              <button type="submit" class="btn btn-success w-100">
+                Создать аккаунт
+              </button>
+            </form>
+            <!-- Switch link -->
+            <div class="text-center mt-3">
+              <a href="#" id="switchAuth" class="small text-primary"
+                >Нет аккаунта? Зарегистрируйтесь</a
+              >
             </div>
           </div>
         </div>
-        <div class="col-md-3">
-          <div class="filter-group">
-            <label class="filter-label">Сортировка</label>
-            <select class="filter-select" id="sortSelect">
-              <option value="relevance" selected>По популярности</option>
-              <option value="price_asc">Цена: по возрастанию</option>
-              <option value="price_desc">Цена: по убыванию</option>
-              <option value="distance_asc">Расстояние: ближайшие</option>
-            </select>
-          </div>
-        </div>
-        <div class="col-12">
-          <div class="d-flex gap-2">
-            <button class="btn-apply" id="applyFilters">Применить фильтры</button>
-            <button class="btn-reset" id="clearBtn">Сбросить</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Active Filters -->
-    <div class="active-filters" id="activeFilters">
-      <span class="filter-chip d-none" id="activeQueryChip"></span>
-      <span class="filter-chip d-none" id="activeSortChip"></span>
-      <button type="button" class="btn-reset d-none" id="clearAll">Сбросить всё</button>
-    </div>
-    
-
-    <!-- Controls -->
-    <div class="controls-row">
-      <div class="results-count">
-        Найдено: <strong id="foundCount">—</strong> товаров
-      </div>
-
-      <div class="d-flex align-items-center gap-3">
-        <div class="view-tabs">
-          <button class="view-tab active" data-view="grid">
-            <i class="bi bi-grid"></i> Сетка
-          </button>
-          <button class="view-tab" data-view="map">
-            <i class="bi bi-map"></i> Карта
-          </button>
-        </div>
       </div>
     </div>
 
-    <!-- Products Grid -->
-    <div class="product-grid" id="cardsGrid">
-      <!-- Product Cards -->
-      <div class="prod-card" data-title="Картофель (1 кг)" data-keywords="картошка картофель овощи гарнир"
-        data-price="450" data-distance="0.8" data-category="овощи" data-brand="">
-        <div class="product-card">
-          <img src="https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&h=300&fit=crop" alt="Картофель"
-            class="product-image">
-          <h3 class="product-title js-title">Картофель (1 кг)</h3>
-          <div class="product-rating">
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-half text-warning"></i>
-            <span>4.3</span>
-            <span class="text-muted">(89 отзывов)</span>
+    <!-- Main Content -->
+    <main class="main-content">
+      <h1 class="page-title">Товары</h1>
+
+      <!-- Filters Section -->
+      <section class="filters-section">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <div class="filter-group">
+              <label class="filter-label">Категория</label>
+              <select class="filter-select" id="categoryFilter">
+                <option value="">Все категории</option>
+                <option value="овощи">Овощи</option>
+                <option value="молочные">Молочные продукты</option>
+                <option value="хлеб">Хлеб</option>
+                <option value="яйца">Яйца</option>
+                <option value="мясо">Мясо</option>
+                <option value="электроника">Электроника</option>
+              </select>
+            </div>
           </div>
-          <div class="product-price">450 ₸</div>
-          <div class="product-actions">
-            <button class="btn-cart">В корзину</button>
-            <button class="btn-wishlist">
-              <i class="bi bi-heart"></i>
+          <div class="col-md-3">
+            <div class="filter-group">
+              <label class="filter-label">Бренд</label>
+              <select class="filter-select" id="brandFilter">
+                <option value="">Все бренды</option>
+                <option value="duracell">Duracell</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="filter-group">
+              <label class="filter-label">Ценовой диапазон</label>
+              <div class="d-flex gap-2">
+                <input
+                  type="number"
+                  class="filter-input"
+                  placeholder="Мин"
+                  id="priceMin"
+                />
+                <input
+                  type="number"
+                  class="filter-input"
+                  placeholder="Макс"
+                  id="priceMax"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="filter-group">
+              <label class="filter-label">Сортировка</label>
+              <select class="filter-select" id="sortSelect">
+                <option value="relevance" selected>По популярности</option>
+                <option value="price_asc">Цена: по возрастанию</option>
+                <option value="price_desc">Цена: по убыванию</option>
+                <option value="distance_asc">Расстояние: ближайшие</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="d-flex gap-2">
+              <button class="btn-apply" id="applyFilters">
+                Применить фильтры
+              </button>
+              <button class="btn-reset" id="clearBtn">Сбросить</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Active Filters -->
+      <div class="active-filters" id="activeFilters">
+        <span class="filter-chip d-none" id="activeQueryChip"></span>
+        <span class="filter-chip d-none" id="activeSortChip"></span>
+        <button type="button" class="btn-reset d-none" id="clearAll">
+          Сбросить всё
+        </button>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls-row">
+        <div class="results-count">
+          Найдено: <strong id="foundCount">—</strong> товаров
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+          <div class="view-tabs">
+            <button class="view-tab active" data-view="grid">
+              <i class="bi bi-grid"></i> Сетка
+            </button>
+            <button class="view-tab" data-view="map">
+              <i class="bi bi-map"></i> Карта
             </button>
           </div>
         </div>
       </div>
 
-
-
-      <div class="prod-card" data-title="Молоко (1 л)" data-keywords="молоко молочные продукты напиток" data-price="550"
-        data-distance="1.1" data-category="молочные" data-brand="">
-        <div class="product-card">
-          <img src="https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400&h=300&fit=crop" alt="Молоко"
-            class="product-image">
-          <h3 class="product-title js-title">Молоко (1 л)</h3>
-          <div class="product-rating">
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-half text-warning"></i>
-            <span>4.5</span>
-            <span class="text-muted">(134 отзыва)</span>
+      <!-- Products Grid -->
+      <div class="product-grid" id="cardsGrid">
+        <!-- Product Cards -->
+        <div
+          class="prod-card"
+          data-title="Картофель (1 кг)"
+          data-keywords="картошка картофель овощи гарнир"
+          data-price="450"
+          data-distance="0.8"
+          data-category="овощи"
+          data-brand=""
+        >
+          <div class="product-card">
+            <img
+              src="https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&h=300&fit=crop"
+              alt="Картофель"
+              class="product-image"
+            />
+            <h3 class="product-title js-title">Картофель (1 кг)</h3>
+            <div class="product-rating">
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star-half text-warning"></i>
+              <span>4.3</span>
+              <span class="text-muted">(89 отзывов)</span>
+            </div>
+            <div class="product-price">450 ₸</div>
+            <div class="product-actions">
+              <button class="btn-cart">В корзину</button>
+              <button class="btn-wishlist">
+                <i class="bi bi-heart"></i>
+              </button>
+            </div>
           </div>
-          <div class="product-price">550 ₸</div>
-          <div class="product-actions">
-            <button class="btn-cart">В корзину</button>
-            <button class="btn-wishlist">
-              <i class="bi bi-heart"></i>
-            </button>
+        </div>
+
+        <div
+          class="prod-card"
+          data-title="Молоко (1 л)"
+          data-keywords="молоко молочные продукты напиток"
+          data-price="550"
+          data-distance="1.1"
+          data-category="молочные"
+          data-brand=""
+        >
+          <div class="product-card">
+            <img
+              src="https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400&h=300&fit=crop"
+              alt="Молоко"
+              class="product-image"
+            />
+            <h3 class="product-title js-title">Молоко (1 л)</h3>
+            <div class="product-rating">
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star-half text-warning"></i>
+              <span>4.5</span>
+              <span class="text-muted">(134 отзыва)</span>
+            </div>
+            <div class="product-price">550 ₸</div>
+            <div class="product-actions">
+              <button class="btn-cart">В корзину</button>
+              <button class="btn-wishlist">
+                <i class="bi bi-heart"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="prod-card"
+          data-title="Хлеб белый"
+          data-keywords="хлеб белый багет выпечка"
+          data-price="280"
+          data-distance="0.9"
+          data-category="хлеб"
+          data-brand=""
+        >
+          <div class="product-card">
+            <img
+              src="https://images.unsplash.com/photo-1549931319-a545dcf3bc73?w=400&h=300&fit=crop"
+              alt="Хлеб"
+              class="product-image"
+            />
+            <h3 class="product-title js-title">Хлеб белый</h3>
+            <div class="product-rating">
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star text-warning"></i>
+              <span>4.2</span>
+              <span class="text-muted">(98 отзывов)</span>
+            </div>
+            <div class="product-price">280 ₸</div>
+            <div class="product-actions">
+              <button class="btn-cart">В корзину</button>
+              <button class="btn-wishlist">
+                <i class="bi bi-heart"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="prod-card"
+          data-title="Яйца куриные (10 шт)"
+          data-keywords="яйца куриные белок завтрак"
+          data-price="650"
+          data-distance="1.4"
+          data-category="яйца"
+          data-brand=""
+        >
+          <div class="product-card">
+            <img
+              src="https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=400&h=300&fit=crop"
+              alt="Яйца"
+              class="product-image"
+            />
+            <h3 class="product-title js-title">Яйца куриные (10 шт)</h3>
+            <div class="product-rating">
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star-fill text-warning"></i>
+              <span>4.7</span>
+              <span class="text-muted">(112 отзывов)</span>
+            </div>
+            <div class="product-price">650 ₸</div>
+            <div class="product-actions">
+              <button class="btn-cart">В корзину</button>
+              <button class="btn-wishlist">
+                <i class="bi bi-heart"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="prod-card"
+          data-title="Курица охлажденная (1 кг)"
+          data-keywords="курица мясо птица охлажденная"
+          data-price="2200"
+          data-distance="2.1"
+          data-category="мясо"
+          data-brand=""
+        >
+          <div class="product-card">
+            <img
+              src="https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=400&h=300&fit=crop"
+              alt="Курица"
+              class="product-image"
+            />
+            <h3 class="product-title js-title">Курица охлажденная (1 кг)</h3>
+            <div class="product-rating">
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star-fill text-warning"></i>
+              <i class="bi bi-star text-warning"></i>
+              <span>4.1</span>
+              <span class="text-muted">(89 отзывов)</span>
+            </div>
+            <div class="product-price">2 200 ₸</div>
+            <div class="product-actions">
+              <button class="btn-cart">В корзину</button>
+              <button class="btn-wishlist">
+                <i class="bi bi-heart"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="prod-card" data-title="Хлеб белый" data-keywords="хлеб белый багет выпечка" data-price="280"
-        data-distance="0.9" data-category="хлеб" data-brand="">
-        <div class="product-card">
-          <img src="https://images.unsplash.com/photo-1549931319-a545dcf3bc73?w=400&h=300&fit=crop" alt="Хлеб"
-            class="product-image">
-          <h3 class="product-title js-title">Хлеб белый</h3>
-          <div class="product-rating">
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star text-warning"></i>
-            <span>4.2</span>
-            <span class="text-muted">(98 отзывов)</span>
-          </div>
-          <div class="product-price">280 ₸</div>
-          <div class="product-actions">
-            <button class="btn-cart">В корзину</button>
-            <button class="btn-wishlist">
-              <i class="bi bi-heart"></i>
-            </button>
-          </div>
+      <!-- Map View -->
+      <div class="map-view" id="mapView">
+        <div id="map"></div>
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="text-center text-muted py-5 d-none">
+        <i class="bi bi-search fs-1 d-block mb-2"></i>
+        По запросу «<span id="emptyQuery">...</span>» ничего не найдено.
+        <div class="small">
+          Попробуйте изменить формулировку или убрать часть слов.
         </div>
       </div>
 
-      <div class="prod-card" data-title="Яйца куриные (10 шт)" data-keywords="яйца куриные белок завтрак"
-        data-price="650" data-distance="1.4" data-category="яйца" data-brand="">
-        <div class="product-card">
-          <img src="https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=400&h=300&fit=crop" alt="Яйца"
-            class="product-image">
-          <h3 class="product-title js-title">Яйца куриные (10 шт)</h3>
-          <div class="product-rating">
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <span>4.7</span>
-            <span class="text-muted">(112 отзывов)</span>
-          </div>
-          <div class="product-price">650 ₸</div>
-          <div class="product-actions">
-            <button class="btn-cart">В корзину</button>
-            <button class="btn-wishlist">
-              <i class="bi bi-heart"></i>
-            </button>
-          </div>
-        </div>
-      </div>
+      <!-- Pagination -->
+      <nav class="mt-4">
+        <ul class="pagination justify-content-center" id="pagination"></ul>
+      </nav>
+    </main>
 
+    <!-- Bootstrap JS -->
+    <!-- В конце body, обновите порядок скриптов -->
+    <script src="bootstrap-5.3.8-dist/js/bootstrap.bundle.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
-
-      <div class="prod-card" data-title="Курица охлажденная (1 кг)" data-keywords="курица мясо птица охлажденная"
-        data-price="2200" data-distance="2.1" data-category="мясо" data-brand="">
-        <div class="product-card">
-          <img src="https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=400&h=300&fit=crop" alt="Курица"
-            class="product-image">
-          <h3 class="product-title js-title">Курица охлажденная (1 кг)</h3>
-          <div class="product-rating">
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star text-warning"></i>
-            <span>4.1</span>
-            <span class="text-muted">(89 отзывов)</span>
-          </div>
-          <div class="product-price">2 200 ₸</div>
-          <div class="product-actions">
-            <button class="btn-cart">В корзину</button>
-            <button class="btn-wishlist">
-              <i class="bi bi-heart"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Map View -->
-    <div class="map-view" id="mapView">
-      <div id="map"></div>
-    </div>
-
-    <!-- Empty State -->
-    <div id="emptyState" class="text-center text-muted py-5 d-none">
-      <i class="bi bi-search fs-1 d-block mb-2"></i>
-      По запросу «<span id="emptyQuery">...</span>» ничего не найдено.
-      <div class="small">Попробуйте изменить формулировку или убрать часть слов.</div>
-    </div>
-
-    <!-- Pagination -->
-    <nav class="mt-4">
-      <ul class="pagination justify-content-center" id="pagination"></ul>
-    </nav>
-  </main>
-
-  <!-- Bootstrap JS -->
-  <!-- В конце body, обновите порядок скриптов -->
-<script src="bootstrap-5.3.8-dist/js/bootstrap.bundle.js"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
-
-<!-- Custom Scripts -->
-<script src="auth.js"></script>
-<script src="productsLoader.js"></script>
-<script src="script.js"></script>
-<script src="map.js"></script>
-
-</body>
-
+    <!-- Custom Scripts -->
+    <script src="auth.js"></script>
+    <script src="productsLoader.js"></script>
+    <script src="script.js"></script>
+    <script src="map.js"></script>
+  </body>
 </html>

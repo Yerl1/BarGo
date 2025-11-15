@@ -12,7 +12,7 @@ type IConsumerRepo interface {
 	GetProductInfo(ctx context.Context, productID string) (dto.ProductStoresInfo, error)
 	GetStoreProducts(ctx context.Context, storeID string, page string, limit string, search string, sort string) ([]dto.ProductInfo, error)
 	GetStoreInfo(ctx context.Context, storeID string) (dto.StoreInfo, error)
-	AddCommentToStore(ctx context.Context, storeID string, comment *dto.AddCommentRequest) error
+	AddCommentToStore(ctx context.Context, storeID string, comment *dto.AddCommentRequest, isToxic bool) error
 	GetStoreComments(ctx context.Context, storeID string) ([]dto.StoreComment, error)
 	UpdateStoreCommentVotes(ctx context.Context, storeID string, commentID string, amount string) error
 }

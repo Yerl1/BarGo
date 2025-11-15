@@ -37,7 +37,7 @@ func main() {
 	logger.Info().Msg("✅ Service starting up...")
 	logger.Debug().Interface("config", cfg).Msg("Loaded configuration")
 
-	fs := http.FileServer(http.Dir("/app/web/consumer"))
+	fs := http.FileServer(http.Dir("/app/web/consumer/Main Page"))
 	http.Handle("/", fs)
 
 	logger.Info().Msgf("Starting consumer-web-service service on port %s", cfg.Srv.ConsumerWebServicePort)

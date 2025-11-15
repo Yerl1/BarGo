@@ -470,10 +470,10 @@ func (r *ConsumerRepo) GetStoreProducts(
 	return products, nil
 }
 
-func (r *ConsumerRepo) AddCommentToStore(ctx context.Context, storeID string, comment *dto.AddCommentRequest) error {
+func (r *ConsumerRepo) AddCommentToStore(ctx context.Context, storeID string, comment *dto.AddCommentRequest, isToxic bool) error {
 	query := `
-		INSERT INTO comments (store_id, user_id, content, rating, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, NOW(), NOW());
+		INSERT INTO comments (store_id, user_id, content, rating, created_at, updated_at, is_toxic)
+		VALUES ($1, $2, $3, $4, NOW(), NOW(), $5);
 	`
 
 	_, err := r.DB.conn.Exec(ctx, query,
@@ -481,6 +481,7 @@ func (r *ConsumerRepo) AddCommentToStore(ctx context.Context, storeID string, co
 		comment.UserID,
 		comment.Content,
 		comment.Rating,
+		isToxic,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to add comment to store: %w", err)
@@ -496,7 +497,8 @@ func (r *ConsumerRepo) GetStoreComments(ctx context.Context, storeID string) ([]
 			user_id,
 			content,
 			rating,
-			helpful_votes
+			helpful_votes,
+			is_toxic
 		FROM comments
 		WHERE store_id = $1;
 	`
@@ -516,6 +518,7 @@ func (r *ConsumerRepo) GetStoreComments(ctx context.Context, storeID string) ([]
 			&comment.Content,
 			&comment.Rating,
 			&comment.HelpfulVotes,
+			&comment.IsToxic,
 		); err != nil {
 			return nil, fmt.Errorf("failed to scan store comment: %w", err)
 		}
