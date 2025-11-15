@@ -6,6 +6,7 @@ type Comment struct {
 	Content      string `db:"content" json:"content"`
 	Rating       int    `db:"rating" json:"rating"`
 	HelpfulVotes int    `db:"helpful_votes" json:"helpful_votes"`
+	IsToxic      bool   `db:"is_toxic" json:"is_toxic"`
 }
 
 type AddCommentRequest struct {
@@ -20,4 +21,5 @@ type StoreComment struct {
 	Content      string `db:"content" json:"content"`
 	Rating       int    `db:"rating" json:"rating"`
 	HelpfulVotes int    `db:"helpful_votes" json:"helpful_votes"`
+	IsToxic      bool   `db:"is_toxic" json:"is_toxic"`
 }

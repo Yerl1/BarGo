@@ -222,8 +222,8 @@ func (r *BusinessRepo) GetProducts(ctx context.Context, storeId string) ([]dto.P
 
 func (r *BusinessRepo) AddProduct(ctx context.Context, storeId string, product dto.Product) error {
 	query := `
-		INSERT INTO products (store_id, name, description, photo, price)
-		VALUES ($1, $2, $3, $4, $5);
+		INSERT INTO products (store_id, name, description, photo, price, in_stock)
+		VALUES ($1, $2, $3, $4, $5, $6);
 	`
 
 	_, err := r.DB.conn.Exec(ctx, query,
@@ -232,6 +232,7 @@ func (r *BusinessRepo) AddProduct(ctx context.Context, storeId string, product d
 		product.Description,
 		product.Photo,
 		product.Price,
+		product.InStock,
 	)
 	return err
 }
@@ -243,8 +244,9 @@ func (r *BusinessRepo) UpdateProduct(ctx context.Context, product dto.Product) e
 			description = $2,
 			photo = $3,
 			price = $4,
-			updated_at = NOW()
-		WHERE product_id = $5;
+			updated_at = NOW(),
+			in_stock = $5
+		WHERE product_id = $6;
 	`
 
 	_, err := r.DB.conn.Exec(ctx, query,
@@ -252,6 +254,7 @@ func (r *BusinessRepo) UpdateProduct(ctx context.Context, product dto.Product) e
 		product.Description,
 		product.Photo,
 		product.Price,
+		product.InStock,
 		product.ProductID,
 	)
 	return err

@@ -132,7 +132,7 @@ func (s *ConsumerService) AddCommentToStore(
 	}
 
 	// Add comment to DB
-	if err := s.ConsumerRepo.AddCommentToStore(ctx, storeID, comment); err != nil {
+	if err := s.ConsumerRepo.AddCommentToStore(ctx, storeID, comment, prediction.IsToxic); err != nil {
 		log.Error().Err(err).Msg("Failed to add comment to store")
 		return fmt.Errorf("failed to add comment to store: %w", err)
 	}

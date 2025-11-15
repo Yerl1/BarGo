@@ -303,6 +303,44 @@ function applyAll(query, keepPage = false) {
   buildPagination(sortedVisible.length, PER_PAGE);
   applyPage(sortedVisible);
 }
+document.addEventListener("DOMContentLoaded", () => {
+  const tabs = document.querySelectorAll(".view-tab");
+  const grid = document.getElementById("cardsGrid");
+  const mapView = document.getElementById("mapView");
+
+  if (!tabs.length || !grid || !mapView) return;
+
+  function setView(view) {
+    if (view === "grid") {
+      grid.style.display = "";
+      mapView.style.display = "none";
+    } else {
+      grid.style.display = "none";
+      mapView.style.display = "block";
+
+      // Чиним размер карты, если она уже инициализирована
+      if (window._leafletMap) {
+        setTimeout(() => {
+          window._leafletMap.invalidateSize();
+        }, 200);
+      }
+    }
+  }
+
+  tabs.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      tabs.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      const view = btn.dataset.view;
+      setView(view);
+    });
+  });
+
+  // По умолчанию – сетка
+  setView("grid");
+});
+
 
 // ---------- LISTENERS ----------
 

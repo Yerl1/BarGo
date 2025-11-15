@@ -9,7 +9,6 @@ import (
 	"backend/internal/mylogger"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/rs/zerolog/log"
 )
 
 type ConsumerRepo struct {
@@ -29,7 +28,7 @@ func NewConsumerRepo(ctx context.Context, db *DB, mylog mylogger.Logger) *Consum
 // GetStores returns all stores within the specified radius (in meters)
 // from the given latitude and longitude.
 func (r *ConsumerRepo) GetStores(ctx context.Context, lat, lon, radius string) ([]dto.Store, error) {
-	log := log.With().Str("method", "GetStores").Logger()
+	log := r.mylog.Logger.With().Str("method", "GetStores").Logger()
 	log.Debug().
 		Str("lat", lat).
 		Str("lon", lon).
@@ -108,7 +107,7 @@ func (r *ConsumerRepo) GetStores(ctx context.Context, lat, lon, radius string) (
 }
 
 func (r *ConsumerRepo) GetAllProducts(ctx context.Context) ([]dto.Product, error) {
-	log := log.With().Str("method", "GetAllProducts").Logger()
+	log := r.mylog.Logger.With().Str("method", "GetAllProducts").Logger()
 	log.Debug().Msg("fetching all products")
 
 	query := `
@@ -117,7 +116,8 @@ func (r *ConsumerRepo) GetAllProducts(ctx context.Context) ([]dto.Product, error
 			name,
 			description,
 			photo,
-			price
+			price,
+			in_stock
 		FROM products;
 	`
 
@@ -140,6 +140,7 @@ func (r *ConsumerRepo) GetAllProducts(ctx context.Context) ([]dto.Product, error
 			&p.Description,
 			&p.Photo,
 			&p.Price,
+			&p.InStock,
 		); err != nil {
 			log.Error().Err(err).Msg("failed to scan product row")
 			return nil, err
@@ -163,7 +164,7 @@ func (r *ConsumerRepo) GetAllProducts(ctx context.Context) ([]dto.Product, error
 }
 
 func (r *ConsumerRepo) GetProductInfo(ctx context.Context, productID string) (dto.ProductStoresInfo, error) {
-	log := log.With().Str("method", "GetProductInfo").Logger()
+	log := r.mylog.Logger.With().Str("method", "GetProductInfo").Logger()
 	log.Debug().
 		Str("product_id", productID).
 		Msg("fetching product info")
@@ -175,7 +176,8 @@ func (r *ConsumerRepo) GetProductInfo(ctx context.Context, productID string) (dt
 			name,
 			description,
 			photo,
-			price
+			price,
+			in_stock
 		FROM products
 		WHERE product_id = $1;
 	`
@@ -186,6 +188,7 @@ func (r *ConsumerRepo) GetProductInfo(ctx context.Context, productID string) (dt
 		&product.Description,
 		&product.Photo,
 		&product.Price,
+		&product.InStock,
 	)
 	if err != nil {
 		log.Error().
@@ -467,10 +470,10 @@ func (r *ConsumerRepo) GetStoreProducts(
 	return products, nil
 }
 
-func (r *ConsumerRepo) AddCommentToStore(ctx context.Context, storeID string, comment *dto.AddCommentRequest) error {
+func (r *ConsumerRepo) AddCommentToStore(ctx context.Context, storeID string, comment *dto.AddCommentRequest, isToxic bool) error {
 	query := `
-		INSERT INTO comments (store_id, user_id, content, rating, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, NOW(), NOW());
+		INSERT INTO comments (store_id, user_id, content, rating, created_at, updated_at, is_toxic)
+		VALUES ($1, $2, $3, $4, NOW(), NOW(), $5);
 	`
 
 	_, err := r.DB.conn.Exec(ctx, query,
@@ -478,6 +481,7 @@ func (r *ConsumerRepo) AddCommentToStore(ctx context.Context, storeID string, co
 		comment.UserID,
 		comment.Content,
 		comment.Rating,
+		isToxic,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to add comment to store: %w", err)
@@ -493,7 +497,8 @@ func (r *ConsumerRepo) GetStoreComments(ctx context.Context, storeID string) ([]
 			user_id,
 			content,
 			rating,
-			helpful_votes
+			helpful_votes,
+			is_toxic
 		FROM comments
 		WHERE store_id = $1;
 	`
@@ -513,6 +518,7 @@ func (r *ConsumerRepo) GetStoreComments(ctx context.Context, storeID string) ([]
 			&comment.Content,
 			&comment.Rating,
 			&comment.HelpfulVotes,
+			&comment.IsToxic,
 		); err != nil {
 			return nil, fmt.Errorf("failed to scan store comment: %w", err)
 		}
