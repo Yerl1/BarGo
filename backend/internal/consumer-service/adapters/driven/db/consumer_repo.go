@@ -9,7 +9,6 @@ import (
 	"backend/internal/mylogger"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/rs/zerolog/log"
 )
 
 type ConsumerRepo struct {
@@ -29,7 +28,7 @@ func NewConsumerRepo(ctx context.Context, db *DB, mylog mylogger.Logger) *Consum
 // GetStores returns all stores within the specified radius (in meters)
 // from the given latitude and longitude.
 func (r *ConsumerRepo) GetStores(ctx context.Context, lat, lon, radius string) ([]dto.Store, error) {
-	log := log.With().Str("method", "GetStores").Logger()
+	log := r.mylog.Logger.With().Str("method", "GetStores").Logger()
 	log.Debug().
 		Str("lat", lat).
 		Str("lon", lon).
@@ -108,7 +107,7 @@ func (r *ConsumerRepo) GetStores(ctx context.Context, lat, lon, radius string) (
 }
 
 func (r *ConsumerRepo) GetAllProducts(ctx context.Context) ([]dto.Product, error) {
-	log := log.With().Str("method", "GetAllProducts").Logger()
+	log := r.mylog.Logger.With().Str("method", "GetAllProducts").Logger()
 	log.Debug().Msg("fetching all products")
 
 	query := `
@@ -117,7 +116,8 @@ func (r *ConsumerRepo) GetAllProducts(ctx context.Context) ([]dto.Product, error
 			name,
 			description,
 			photo,
-			price
+			price,
+			in_stock
 		FROM products;
 	`
 
@@ -140,6 +140,7 @@ func (r *ConsumerRepo) GetAllProducts(ctx context.Context) ([]dto.Product, error
 			&p.Description,
 			&p.Photo,
 			&p.Price,
+			&p.InStock,
 		); err != nil {
 			log.Error().Err(err).Msg("failed to scan product row")
 			return nil, err
@@ -163,7 +164,7 @@ func (r *ConsumerRepo) GetAllProducts(ctx context.Context) ([]dto.Product, error
 }
 
 func (r *ConsumerRepo) GetProductInfo(ctx context.Context, productID string) (dto.ProductStoresInfo, error) {
-	log := log.With().Str("method", "GetProductInfo").Logger()
+	log := r.mylog.Logger.With().Str("method", "GetProductInfo").Logger()
 	log.Debug().
 		Str("product_id", productID).
 		Msg("fetching product info")
@@ -175,7 +176,8 @@ func (r *ConsumerRepo) GetProductInfo(ctx context.Context, productID string) (dt
 			name,
 			description,
 			photo,
-			price
+			price,
+			in_stock
 		FROM products
 		WHERE product_id = $1;
 	`
@@ -186,6 +188,7 @@ func (r *ConsumerRepo) GetProductInfo(ctx context.Context, productID string) (dt
 		&product.Description,
 		&product.Photo,
 		&product.Price,
+		&product.InStock,
 	)
 	if err != nil {
 		log.Error().

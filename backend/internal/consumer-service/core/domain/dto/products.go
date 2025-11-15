@@ -9,7 +9,8 @@ type Product struct {
 	Name        string  `db:"name" json:"name"`
 	Description *string `db:"description" json:"description,omitempty"`
 	Photo       *string `db:"photo" json:"photo,omitempty"`
-	Price       float64 `db:"price" json:"price"` // exact decimal for money
+	Price       float64 `db:"price" json:"price"` // exact decimal for money'
+	InStock     bool    `db:"in_stock" json:"in_stock"`
 }
 
 type ProductInfo struct {
