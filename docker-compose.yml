@@ -159,7 +159,7 @@ services:
     container_name: osrm-car
     command: osrm-routed --algorithm mld /data/kazakhstan-251102.osrm
     ports:
-      - "5000:5000"
+      - "5009:5000"
     volumes:
       - ./map_data/car:/data
     restart: unless-stopped
