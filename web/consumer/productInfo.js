@@ -15,7 +15,9 @@ async function initProductDetails() {
 
   try {
     const resp = await fetch(
-      `http://localhost:3002/product-info?product_id=${encodeURIComponent(productId)}`
+      `http://localhost:3002/product-info?product_id=${encodeURIComponent(
+        productId
+      )}`
     );
     if (!resp.ok)
       throw new Error(`Failed to load product info: ${resp.status}`);
@@ -26,7 +28,6 @@ async function initProductDetails() {
     const product = data.product;
     const stores = data.stores || [];
 
-    // === Подставляем данные товара ===
     const imgEl = document.getElementById("productImage");
     if (imgEl && product.photo) {
       imgEl.src = product.photo;
@@ -43,15 +44,15 @@ async function initProductDetails() {
       document.getElementById("productDescription").textContent =
         product.description;
 
-    // === ГЛАВНОЕ! Рендерим магазины из API ===
-    if (stores.length > 0) {
+    // 🔹 ВАЖНО: рендерим магазины из ответа API
+    if (stores.length) {
       renderShopsFromApi(stores);
     }
-
   } catch (err) {
     console.error("Error loading product info:", err);
   }
 }
+
 
 
 // ------ Stores list / filters ------
@@ -120,11 +121,15 @@ function createShopCard(shop) {
   card.className = "store-card";
   card.style.cursor = "pointer";
 
-  card.addEventListener("click", () => {
-    if (shop.id) {
-      window.location.href = `store.html?id=${shop.id}`;
-    }
-  });
+  // Берём store_id из ответа API
+  const storeId = shop.store_id || shop.id;
+
+  // Клик по всей карточке – переход на страницу магазина
+  if (storeId) {
+    card.addEventListener("click", () => {
+      window.location.href = `store.html?id=${encodeURIComponent(storeId)}`;
+    });
+  }
 
   const price = shop.price ?? 0;
   const distance = shop.distance_km ?? null;
@@ -160,6 +165,7 @@ function createShopCard(shop) {
 
   return card;
 }
+
 
 
 function initStoreFilters() {
