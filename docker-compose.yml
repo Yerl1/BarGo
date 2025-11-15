@@ -136,7 +136,7 @@ services:
       - auth-service
     restart: unless-stopped
     volumes:
-      - ./web:/app/web:ro
+      - ./web/consumer:/app/web/consumer:ro
 
   business-web-service:
     build:
@@ -149,7 +149,7 @@ services:
       - auth-service
     restart: unless-stopped
     volumes:
-      - ./web:/app/web:ro
+      - ./web/business:/app/web/business:ro
 
   # ------------------------------
   # OSRM - Car Profile
